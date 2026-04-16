@@ -137,11 +137,21 @@ app.get('/api/dashboard', async (req, res) => {
     const perDerivacio = {};
     let pendingGestions = 0;
 
+    const MONTH_NAMES = ['Gen','Feb','Mar','Abr','Mai','Jun','Jul','Ago','Set','Oct','Nov','Des'];
+    const perMes = {};
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(anyActual, mesActual - i, 1);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      perMes[key] = { label: MONTH_NAMES[d.getMonth()], count: 0, isCurrent: i === 0 };
+    }
+
     rows.forEach(r => {
       const d = new Date(r[fechaIdx]);
       if (!isNaN(d)) {
         if (d.getMonth() === mesActual && d.getFullYear() === anyActual) atencionesMes++;
         if (d.getMonth() === mesAnterior && d.getFullYear() === anyAnterior) atencionesMesAnterior++;
+        const key = `${d.getFullYear()}-${d.getMonth()}`;
+        if (perMes[key]) perMes[key].count++;
       }
       const t = r[quiRepIdx] || 'Altres';
       const dv = r[derivacioIdx] || 'Altres';
@@ -149,6 +159,8 @@ app.get('/api/dashboard', async (req, res) => {
       perDerivacio[dv] = (perDerivacio[dv] || 0) + 1;
       if (r[calAssIdx] === 'Pendent' || r[calAssIdx] === 'Si') pendingGestions++;
     });
+
+    const tendenciaMensual = Object.values(perMes);
 
     const uH = uValues[0] || [];
     const dniIdxU = uH.indexOf('DNI');
@@ -166,7 +178,7 @@ app.get('/api/dashboard', async (req, res) => {
       };
     });
 
-    res.json({ ok: true, totalUsuaris, totalAtencions, atencionesMes, atencionesMesAnterior, pendingGestions, perTecnic, perDerivacio, ultimes });
+    res.json({ ok: true, totalUsuaris, totalAtencions, atencionesMes, atencionesMesAnterior, pendingGestions, perTecnic, perDerivacio, ultimes, tendenciaMensual });
   } catch (e) {
     res.json({ ok: false, error: e.message });
   }

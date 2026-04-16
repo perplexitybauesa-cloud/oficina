@@ -99,7 +99,16 @@ function getDashboardStats() {
 
     let atencionesMes = 0;
     let atencionesMesAnterior = 0;
-    
+
+    // Preparar tendencia mensual ultimos 6 meses
+    const MONTH_NAMES = ['Gen','Feb','Mar','Abr','Mai','Jun','Jul','Ago','Set','Oct','Nov','Des'];
+    const perMes = {};
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(anyActual, mesActual - i, 1);
+      const key = d.getFullYear() + '-' + d.getMonth();
+      perMes[key] = { label: MONTH_NAMES[d.getMonth()], count: 0, isCurrent: i === 0 };
+    }
+
     rows.forEach(r => {
       const d = new Date(r[fechaIdx]);
       if (!isNaN(d)) {
@@ -109,8 +118,12 @@ function getDashboardStats() {
         if (d.getMonth() === mesAnterior && d.getFullYear() === anyAnterior) {
           atencionesMesAnterior++;
         }
+        const key = d.getFullYear() + '-' + d.getMonth();
+        if (perMes[key]) perMes[key].count++;
       }
     });
+
+    const tendenciaMensual = Object.values(perMes);
 
     // Agrupar atenciones por tecnico y por derivacion
     const perTecnic = {};
@@ -156,7 +169,8 @@ function getDashboardStats() {
       pendingGestions,
       perTecnic, 
       perDerivacio, 
-      ultimes 
+      ultimes,
+      tendenciaMensual
     };
   } catch(e) {
     return { ok: false, error: e.toString() };
