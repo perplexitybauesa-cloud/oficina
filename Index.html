@@ -1012,8 +1012,8 @@ function performGlobalSearch(query) {
   const results = document.getElementById('global-search-results');
   const q = query.toUpperCase();
   const matches = allUsers.filter(u => 
-    (u.NOM && u.NOM.toUpperCase().includes(q)) || 
-    (u.DNI && u.DNI.toUpperCase().includes(q))
+    (u.NOM && String(u.NOM).toUpperCase().includes(q)) || 
+    (u.DNI && String(u.DNI).toUpperCase().includes(q))
   ).slice(0, 5);
   
   if (matches.length === 0) {
@@ -1186,6 +1186,13 @@ function handleLookup(r) {
   const el = document.getElementById('lookup-result');
   el.style.display = 'block';
 
+  if (!r) {
+    el.innerHTML = `<div class="user-found" style="border-color:var(--error);color:var(--error)">
+      Error en la cerca: Resposta buida del servidor
+    </div>`;
+    return;
+  }
+
   if (r.ok === false) {
     el.innerHTML = `<div class="user-found" style="border-color:var(--error);color:var(--error)">
       Error en la cerca: ${r.error}
@@ -1351,6 +1358,10 @@ function searchUser() {
 
 function renderUserCard(r) {
   const el = document.getElementById('search-result');
+  if (!r) {
+    el.innerHTML = `<div class="empty-state"><p>Error: Resposta buida del servidor</p></div>`;
+    return;
+  }
   if (!r.trobat) {
     el.innerHTML = `<div class="empty-state">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1586,6 +1597,7 @@ function loadRegistres() {
 }
 
 function renderRegistres(d) {
+  if (!d) { showToast('Error: Resposta buida del servidor', 'error'); return; }
   if (!d.ok) { showToast('Error: ' + d.error,'error'); return; }
   const rows = d.rows.map(r => `
     <tr class="expandable-row" onclick="toggleExpand(this)">

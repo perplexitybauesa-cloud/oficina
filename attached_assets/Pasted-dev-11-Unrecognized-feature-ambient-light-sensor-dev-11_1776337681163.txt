@@ -1,0 +1,47 @@
+dev:11 Unrecognized feature: 'ambient-light-sensor'.
+dev:11 Unrecognized feature: 'speaker'.
+dev:11 Unrecognized feature: 'vibrate'.
+dev:11 Unrecognized feature: 'vr'.
+about:blank:1 An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing.
+userCodeAppPanel?createOAuthDialog=true:1 Unrecognized feature: 'ambient-light-sensor'.
+userCodeAppPanel?createOAuthDialog=true:1 Unrecognized feature: 'speaker'.
+userCodeAppPanel?createOAuthDialog=true:1 Unrecognized feature: 'vibrate'.
+userCodeAppPanel?createOAuthDialog=true:1 Unrecognized feature: 'vr'.
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from IDLE to BUSY
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from BUSY to IDLE
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from IDLE to BUSY
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from BUSY to IDLE
+121348469-mae_html_user_bin_i18n_mae_html_user__es.js:291 Uncaught Bs {message: "Error in protected function: Cannot read properties of null (reading 'ok')", cause: TypeError: Cannot read properties of null (reading 'ok')
+    at handleLookup (https://n-xyyymuk65k2…, g: true, stack: 'TypeError: Cannot read properties of null (reading…e_html_user_bin_i18n_mae_html_user__es.js:191:52)'}
+Bs @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:291
+As @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:289
+c @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:288
+a @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:191
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from IDLE to BUSY
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from BUSY to IDLE
+121348469-mae_html_user_bin_i18n_mae_html_user__es.js:291 Uncaught Bs {message: "Error in protected function: Cannot read properties of null (reading 'trobat')", cause: TypeError: Cannot read properties of null (reading 'trobat')
+    at renderUserCard (https://n-xyyym…, g: true, stack: 'TypeError: Cannot read properties of null (reading…e_html_user_bin_i18n_mae_html_user__es.js:191:52)'}
+Bs @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:291
+As @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:289
+c @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:288
+a @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:191
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from IDLE to BUSY
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from BUSY to IDLE
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from IDLE to BUSY
+3528035387-warden_bin_i18n_warden__es.js:151 Net state changed from BUSY to IDLE
+121348469-mae_html_user_bin_i18n_mae_html_user__es.js:291 Uncaught Bs {message: "Error in protected function: Cannot read properties of null (reading 'ok')", cause: TypeError: Cannot read properties of null (reading 'ok')
+    at renderRegistres (https://n-xyyymuk6…, g: true, stack: 'TypeError: Cannot read properties of null (reading…e_html_user_bin_i18n_mae_html_user__es.js:191:52)'}
+Bs @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:291
+As @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:289
+c @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:288
+a @ 121348469-mae_html_user_bin_i18n_mae_html_user__es.js:191
+userCodeAppPanel?createOAuthDialog=true:97 Uncaught TypeError: u.DNI.toUpperCase is not a function
+    at userCodeAppPanel?createOAuthDialog=true:97:21
+    at Array.filter (<anonymous>)
+    at performGlobalSearch (userCodeAppPanel?createOAuthDialog=true:95:28)
+    at globalSearch (userCodeAppPanel?createOAuthDialog=true:88:5)
+    at HTMLInputElement.oninput (userCodeAppPanel?createOAuthDialog=true:1:24974)
+(anonymous) @ userCodeAppPanel?createOAuthDialog=true:97
+performGlobalSearch @ userCodeAppPanel?createOAuthDialog=true:95
+globalSearch @ userCodeAppPanel?createOAuthDialog=true:88
+oninput @ userCodeAppPanel?createOAuthDialog=true:1
