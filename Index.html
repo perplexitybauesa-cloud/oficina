@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Seguiment d'Usuaris</title>
+<title>CRM · OPE Sant Adrià de Besòs</title>
 <style>
-/* ── TOKENS ──────────────────────────────────────────── */
+/* ── TOKENS AJUNTAMENT DE SANT ADRIÀ ─────────────────── */
 :root,[data-theme="light"]{
-  --bg:#f7f6f2;--surface:#ffffff;--surface-2:#f3f0ec;--border:#dcd9d5;
-  --text:#28251d;--muted:#7a7974;--faint:#bab9b4;
-  --primary:#01696f;--primary-h:#0c4e54;--primary-hi:#cedcd8;
-  --success:#437a22;--error:#a12c7b;--warn:#964219;
-  --shadow:0 2px 8px rgba(0,0,0,.08);--shadow-lg:0 8px 28px rgba(0,0,0,.12);
+  --bg:#f4f5f7;--surface:#ffffff;--surface-2:#eaecee;--border:#d5d8dc;
+  --text:#1c1e21;--muted:#5c636a;--faint:#a9b0b7;
+  --primary:#8e132b;--primary-h:#6e0e20;--primary-hi:#fcf0f2;
+  --success:#198754;--error:#dc3545;--warn:#fd7e14;
+  --shadow:0 2px 8px rgba(0,0,0,.06);--shadow-lg:0 8px 24px rgba(0,0,0,.12);
   --r:0.5rem;--r-lg:0.75rem;--r-full:9999px;
   --font:'Inter','Helvetica Neue',sans-serif;
   --tr:160ms cubic-bezier(.16,1,.3,1);
@@ -19,7 +19,7 @@
 [data-theme="dark"]{
   --bg:#171614;--surface:#1c1b19;--surface-2:#22211f;--border:#393836;
   --text:#cdccca;--muted:#797876;--faint:#5a5957;
-  --primary:#4f98a3;--primary-h:#227f8b;--primary-hi:#313b3b;
+  --primary:#a82a41;--primary-h:#7a1b2d;--primary-hi:#3b1e23;
   --shadow:0 2px 8px rgba(0,0,0,.3);--shadow-lg:0 8px 28px rgba(0,0,0,.4);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -244,7 +244,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside id="sidebar">
   <div class="sidebar-logo">
     <div class="logo-mark">
@@ -254,8 +253,8 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
       </svg>
     </div>
     <div>
-      <div class="logo-text">Seguiment</div>
-      <div class="logo-sub">Penta Comunidad</div>
+      <div class="logo-text">OPE Sant Adrià</div>
+      <div class="logo-sub">Ajuntament</div>
     </div>
   </div>
   <nav class="sidebar-nav">
@@ -299,7 +298,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
   </div>
 </aside>
 
-<!-- MAIN -->
 <div id="main">
   <header id="topbar">
     <button id="menu-btn" class="btn-icon" onclick="toggleSidebar()">
@@ -310,14 +308,13 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
     </button>
     <span id="page-title">Dashboard</span>
     <span style="flex:1"></span>
-    <button class="btn btn-primary" onclick="navigate('nova-atencio')" style="height:30px;font-size:12px">
+    <button class="btn btn-primary" onclick="startNovaAtencio()" style="height:30px;font-size:12px">
       + Nova Atenció
     </button>
   </header>
 
   <div id="content">
 
-    <!-- ── DASHBOARD ──────────────────────────────── -->
     <div class="view active" id="view-dashboard">
       <div id="kpi-area">
         <div class="loading-row"><div class="spinner"></div> Carregant estadístiques…</div>
@@ -362,9 +359,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
       </div>
     </div>
 
-    <!-- ── NOVA ATENCIÓ ───────────────────────────── -->
     <div class="view" id="view-nova-atencio">
-      <!-- Step indicator -->
       <div class="steps">
         <div class="step active" id="step1">1</div>
         <div class="step-line" id="line1"></div>
@@ -374,7 +369,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
         <span style="margin-left:8px;font-size:12px;color:var(--muted)" id="step-label">Identificació</span>
       </div>
 
-      <!-- STEP 1: DNI lookup -->
       <div id="step-1" class="card">
         <div class="form-section-title">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -396,7 +390,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
         <div id="lookup-result" style="display:none"></div>
       </div>
 
-      <!-- STEP 2: User + attention data -->
       <div id="step-2" style="display:none">
         <div class="card">
           <div class="form-section-title">👤 Dades personals</div>
@@ -485,7 +478,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
         </div>
       </div>
 
-      <!-- STEP 3: Assessoraments -->
       <div id="step-3" style="display:none">
         <div class="card">
           <div class="form-section-title">⚡ Assessoraments realitzats</div>
@@ -540,7 +532,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
       </div>
     </div>
 
-    <!-- ── CERCA USUARI ───────────────────────────── -->
     <div class="view" id="view-cerca">
       <div class="card">
         <div class="form-section-title">
@@ -559,7 +550,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
       <div id="search-result"></div>
     </div>
 
-    <!-- ── ÚLTIMS REGISTRES ───────────────────────── -->
     <div class="view" id="view-registres">
       <div class="card" style="padding:0;overflow:hidden">
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
@@ -582,11 +572,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
       </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
-
-<!-- Toast -->
-<div id="toast"></div>
+  </div></div><div id="toast"></div>
 
 <script>
 // ── STATE ────────────────────────────────────────────────────
@@ -625,6 +611,14 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
 }
 
+function startNovaAtencio() {
+  clearForm();
+  document.getElementById('input-dni').value = '';
+  document.getElementById('lookup-result').style.display = 'none';
+  goStep(1);
+  navigate('nova-atencio');
+}
+
 // ── THEME ─────────────────────────────────────────────────────
 function toggleTheme() {
   isDarkMode = !isDarkMode;
@@ -655,7 +649,6 @@ function renderDashboard(d) {
   if (!d.ok) { showToast('Error: ' + d.error, 'error'); return; }
   statsLoaded = true;
 
-  // KPIs
   document.getElementById('kpi-area').innerHTML = `
     <div class="kpi-grid">
       <div class="kpi-card accent">
@@ -680,12 +673,9 @@ function renderDashboard(d) {
       </div>
     </div>`;
 
-  // Chart tècnics
   renderBarChart('chart-tecnic', d.perTecnic);
-  // Chart derivació
   renderBarChart('chart-derivacio', d.perDerivacio);
 
-  // Table
   const rows = d.ultimes.map(r => `
     <tr onclick="openUser('${r.dni}')">
       <td>${r.fecha}</td>
@@ -738,7 +728,6 @@ function handleLookup(r) {
   const el = document.getElementById('lookup-result');
   el.style.display = 'block';
 
-  // Error del servidor (excepció en buscarUsuariPerDNI)
   if (r.ok === false) {
     el.innerHTML = `<div class="user-found" style="border-color:var(--error);color:var(--error)">
       ⚠️ Error en la cerca: ${r.error}
@@ -864,16 +853,7 @@ function submitForm() {
       if (r.ok) {
         showToast(r.missatge, 'success');
         statsLoaded = false;
-        clearForm();
-        goStep(1);
-        document.getElementById('input-dni').value = '';
-        document.getElementById('lookup-result').style.display = 'none';
-        document.getElementById('step-2').style.display = 'none';
-        document.getElementById('step-3').style.display = 'none';
-        document.getElementById('step-1').style.display = 'block';
-        currentStep = 1;
-        [1,2,3].forEach(i => { document.getElementById('step'+i).className='step'+(i===1?' active':''); });
-        document.getElementById('step-label').textContent = 'Identificació';
+        startNovaAtencio(); // Reset form securely
       } else {
         showToast('Error: ' + r.error, 'error');
       }
@@ -908,7 +888,7 @@ function renderUserCard(r) {
         <line x1="8" y1="11" x2="14" y2="11"/>
       </svg>
       <p>No s'ha trobat cap usuari amb aquest DNI/NIE</p>
-      <button class="btn btn-primary" style="margin-top:12px" onclick="navigate('nova-atencio')">+ Crear usuari nou</button>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="newAtencioForUser(document.getElementById('search-dni').value)">+ Crear usuari nou</button>
     </div>`;
     return;
   }
