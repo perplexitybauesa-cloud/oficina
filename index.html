@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="ca" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oficina Pobresa i Eficiencia Energetica - Sant Adria de Besos</title>
+<style>
+/* ── TOKENS - Colores corporativos Ajuntament Sant Adria de Besos ── */
+:root,[data-theme="light"]{
+  --bg:#f8f7f5;--surface:#ffffff;--surface-2:#f5f3f0;--border:#e0dbd5;
+  --text:#2d2a26;--muted:#6b6660;--faint:#a8a29e;
+  --primary:#8B1C4A;--primary-h:#6d1539;--primary-hi:#f3e6ec;
+  --secondary:#c41e5c;--accent:#d4447a;
+  --success:#2e7d32;--error:#c62828;--warn:#ef6c00;--info:#1565c0;
+  --shadow:0 2px 8px rgba(139,28,74,.08);--shadow-lg:0 8px 28px rgba(139,28,74,.12);
+  --r:0.5rem;--r-lg:0.75rem;--r-full:9999px;
+  --font:'Inter','Helvetica Neue',sans-serif;
+  --tr:160ms cubic-bezier(.16,1,.3,1);
+}
+[data-theme="dark"]{
+  --bg:#1a1816;--surface:#201e1c;--surface-2:#2a2724;--border:#3d3935;
+  --text:#e8e6e3;--muted:#9a958f;--faint:#6b6660;
+  --primary:#c95a8a;--primary-h:#a84872;--primary-hi:#3d2530;
+  --secondary:#d4447a;--accent:#e87aa4;
+  --shadow:0 2px 8px rgba(0,0,0,.3);--shadow-lg:0 8px 28px rgba(0,0,0,.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text);
+     display:flex;height:100dvh;overflow:hidden}
+a,button,[role="button"]{transition:background var(--tr),color var(--tr),border-color var(--tr),box-shadow var(--tr)}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+input,select,textarea{font:inherit;color:inherit}
+img{display:block;max-width:100%}
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+#sidebar{
+  width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:0;overflow:hidden;transition:width var(--tr);
+}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{
+  height:52px;min-height:52px;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;padding:0 20px;
+}
+#content{flex:1;overflow-y:auto;padding:24px}
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.sidebar-logo{
+  padding:18px 20px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.logo-mark{width:30px;height:30px;background:var(--primary);border-radius:var(--r);
+           display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{color:#fff}
+.logo-text{font-size:13px;font-weight:700;letter-spacing:-.2px;line-height:1.2}
+.logo-sub{font-size:11px;color:var(--muted);font-weight:400}
+.sidebar-nav{padding:10px 10px;flex:1;overflow-y:auto}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--faint);
+           text-transform:uppercase;padding:6px 10px 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);
+  cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);
+  margin-bottom:1px;user-select:none;
+}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item.active{background:var(--primary-hi);color:var(--primary);font-weight:600}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--error);color:#fff;font-size:10px;font-weight:700;
+           padding:2px 6px;border-radius:var(--r-full);min-width:18px;text-align:center}
+.sidebar-footer{padding:12px 10px;border-top:1px solid var(--border)}
+
+/* ── TOPBAR ──────────────────────────────────────────── */
+#page-title{font-size:14px;font-weight:600}
+.topbar-search{
+  flex:1;max-width:320px;position:relative;margin:0 16px;
+}
+.topbar-search input{
+  width:100%;height:34px;padding:0 12px 0 34px;background:var(--surface-2);
+  border:1px solid transparent;border-radius:var(--r);font-size:13px;
+}
+.topbar-search input:focus{background:var(--surface);border-color:var(--primary);outline:none}
+.topbar-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);
+                   color:var(--muted);pointer-events:none}
+.topbar-search-results{
+  position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);
+  max-height:300px;overflow-y:auto;z-index:100;display:none;
+}
+.topbar-search-results.show{display:block}
+.search-result-item{padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;
+                    border-bottom:1px solid var(--border)}
+.search-result-item:last-child{border-bottom:none}
+.search-result-item:hover{background:var(--surface-2)}
+.search-result-name{font-weight:600;font-size:13px}
+.search-result-dni{font-size:11px;color:var(--muted);font-family:monospace}
+
+.btn-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+          border-radius:var(--r);color:var(--muted)}
+.btn-icon:hover{background:var(--surface-2);color:var(--text)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r-full);
+       font-size:11px;font-weight:600;gap:4px}
+.badge-green{background:#d7e8d7;color:#2e7d32}
+.badge-blue{background:#e8d7e2;color:#8B1C4A}
+.badge-orange{background:#ffe8d6;color:#bf5700}
+.badge-purple{background:#f3e6ec;color:#c41e5c}
+.badge-red{background:#ffebee;color:#c62828}
+.badge-yellow{background:#fff8e1;color:#f57f17}
+[data-theme="dark"] .badge-green{background:#2a3d2a;color:#81c784}
+[data-theme="dark"] .badge-blue{background:#3d2530;color:#c95a8a}
+[data-theme="dark"] .badge-orange{background:#4a3520;color:#ffb74d}
+[data-theme="dark"] .badge-purple{background:#3d2530;color:#d4447a}
+[data-theme="dark"] .badge-red{background:#4a2020;color:#ef9a9a}
+[data-theme="dark"] .badge-yellow{background:#4a4520;color:#fff176}
+
+/* ── VIEWS ───────────────────────────────────────────── */
+.view{display:none;animation:fadeIn .18s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── CARDS / KPIs ────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+          padding:16px;box-shadow:var(--shadow);cursor:pointer;transition:transform var(--tr),box-shadow var(--tr)}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.kpi-label{font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--muted);
+           text-transform:uppercase;margin-bottom:6px}
+.kpi-value{font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--text);line-height:1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.kpi-card.accent{background:var(--primary);border-color:var(--primary)}
+.kpi-card.accent .kpi-label,.kpi-card.accent .kpi-sub{color:rgba(255,255,255,.7)}
+.kpi-card.accent .kpi-value{color:#fff}
+.kpi-trend{display:inline-flex;align-items:center;gap:3px;font-size:11px;margin-left:6px}
+.kpi-trend.up{color:var(--success)}
+.kpi-trend.down{color:var(--error)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+      padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-title{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;
+            gap:6px;color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:900px){.three-col{grid-template-columns:1fr}}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+
+/* ── QUICK ACTIONS ───────────────────────────────────── */
+.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.quick-action{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  cursor:pointer;font-size:13px;font-weight:500;transition:all var(--tr);
+}
+.quick-action:hover{border-color:var(--primary);background:var(--primary-hi)}
+.quick-action svg{color:var(--primary)}
+
+/* ── ALERTS BANNER ───────────────────────────────────── */
+.alert-banner{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  border-radius:var(--r-lg);margin-bottom:16px;font-size:13px;
+}
+.alert-banner.warning{background:#fff8e1;border:1px solid #ffcc02;color:#7b5800}
+.alert-banner.error{background:#ffebee;border:1px solid #ef9a9a;color:#c62828}
+.alert-banner.info{background:#e3f2fd;border:1px solid #90caf9;color:#1565c0}
+.alert-banner.success{background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32}
+[data-theme="dark"] .alert-banner.warning{background:#3d3520;border-color:#8b7000;color:#ffd54f}
+[data-theme="dark"] .alert-banner.error{background:#4a2020;border-color:#c62828;color:#ef9a9a}
+[data-theme="dark"] .alert-banner.info{background:#1a3a5c;border-color:#1565c0;color:#90caf9}
+[data-theme="dark"] .alert-banner.success{background:#1a3d1a;border-color:#2e7d32;color:#a5d6a7}
+.alert-banner svg{flex-shrink:0}
+.alert-banner-close{margin-left:auto;cursor:pointer;opacity:.6}
+.alert-banner-close:hover{opacity:1}
+
+/* ── TABLE ───────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--surface-2);font-weight:600;font-size:11px;letter-spacing:.04em;
+         text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;
+         white-space:nowrap}
+tbody tr{border-top:1px solid var(--border);cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+tbody td{padding:10px 12px;vertical-align:middle;color:var(--text)}
+.td-muted{color:var(--muted);font-size:12px}
+.td-mono{font-family:monospace;font-size:12px;color:var(--muted)}
+
+/* ── EXPANDABLE ROW ──────────────────────────────────── */
+.expandable-row{cursor:pointer}
+.expandable-row .expand-icon{transition:transform var(--tr)}
+.expandable-row.expanded .expand-icon{transform:rotate(90deg)}
+.expand-content{display:none;background:var(--surface-2);padding:16px;border-top:1px solid var(--border)}
+.expand-content.show{display:block}
+.expand-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.expand-tag{background:var(--primary-hi);color:var(--primary);padding:4px 10px;
+            border-radius:var(--r-full);font-size:11px;font-weight:500}
+
+/* ── CHART BARS ──────────────────────────────────────── */
+.bar-list{display:flex;flex-direction:column;gap:8px}
+.bar-item{display:flex;flex-direction:column;gap:3px}
+.bar-label{display:flex;justify-content:space-between;font-size:12px}
+.bar-label span:last-child{font-weight:600;color:var(--primary)}
+.bar-track{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;background:var(--primary);border-radius:3px;
+          transition:width .5s cubic-bezier(.16,1,.3,1)}
+
+/* ── TABS ────────────────────────────────────────────── */
+.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;
+     border-bottom:2px solid transparent;margin-bottom:-1px;transition:all var(--tr)}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+
+/* ── FILTERS ─────────────────────────────────────────── */
+.filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-bar label{font-size:12px;font-weight:600;color:var(--muted)}
+.filter-bar select,.filter-bar input{height:32px;padding:0 10px;font-size:12px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.filter-bar select{min-width:120px}
+.filter-btn{height:32px;padding:0 12px;font-size:12px;font-weight:500;border-radius:var(--r);
+            background:var(--surface-2);border:1px solid var(--border);cursor:pointer}
+.filter-btn:hover{background:var(--border)}
+.filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* ── FORM ────────────────────────────────────────────── */
+.form-section{margin-bottom:24px}
+.form-section-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+                    color:var(--muted);margin-bottom:12px;padding-bottom:8px;
+                    border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.form-grid.full{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:4px}
+label{font-size:12px;font-weight:600;color:var(--muted)}
+label .req{color:var(--error)}
+.inp{
+  height:36px;padding:0 10px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);font-size:13px;color:var(--text);width:100%;
+  transition:border-color var(--tr),box-shadow var(--tr);
+}
+textarea.inp{height:auto;padding:8px 10px;resize:vertical;min-height:70px}
+.inp:focus{outline:none;border-color:var(--primary);
+           box-shadow:0 0 0 3px color-mix(in oklab,var(--primary) 15%,transparent)}
+.inp::placeholder{color:var(--faint)}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7974' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+
+/* DNI search box */
+.dni-search-wrap{display:flex;gap:8px;margin-bottom:16px}
+.dni-search-wrap .inp{flex:1;font-size:14px;font-weight:500;text-transform:uppercase;height:42px}
+
+/* User found banner */
+.user-found{background:var(--primary-hi);border:1px solid color-mix(in oklab,var(--primary) 30%,transparent);
+            border-radius:var(--r-lg);padding:12px 16px;display:flex;align-items:center;
+            gap:10px;font-size:13px;margin-bottom:18px;color:var(--primary)}
+.user-new{background:#d7e8d7;border:1px solid #2e7d32;color:#1b5e20}
+[data-theme="dark"] .user-new{background:#2a3d2a;border-color:#81c784;color:#81c784}
+.user-found svg{flex-shrink:0}
+
+/* Checkbox grid */
+.check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px}
+.check-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--r);
+            cursor:pointer;font-size:13px;border:1px solid transparent}
+.check-item:hover{background:var(--surface-2);border-color:var(--border)}
+.check-item input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
+.check-group-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+                   color:var(--muted);margin:12px 0 6px;grid-column:1/-1}
+
+/* Steps */
+.steps{display:flex;gap:6px;margin-bottom:24px;align-items:center}
+.step{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);
+      display:flex;align-items:center;justify-content:center;font-size:12px;
+      font-weight:700;color:var(--muted)}
+.step.done{background:var(--primary);border-color:var(--primary);color:#fff}
+.step.active{border-color:var(--primary);color:var(--primary)}
+.step-line{flex:1;height:2px;background:var(--border);border-radius:1px}
+.step-line.done{background:var(--primary)}
+
+/* Buttons */
+.btn{height:36px;padding:0 16px;border-radius:var(--r);font-size:13px;font-weight:600;
+     display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-h)}
+.btn-secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#1b5e20}
+.btn-warning{background:var(--warn);color:#fff}
+.btn-warning:hover{background:#e65100}
+.btn-lg{height:42px;padding:0 20px;font-size:14px}
+.btn-sm{height:28px;padding:0 10px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+
+/* Search result card */
+.user-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+           overflow:hidden;box-shadow:var(--shadow)}
+.user-card-header{background:var(--primary);padding:16px 20px;color:#fff;display:flex;
+                  align-items:flex-start;justify-content:space-between}
+.user-card-header h2{font-size:16px;font-weight:700;margin-bottom:4px}
+.user-card-header .sub{font-size:12px;opacity:.8}
+.user-card-actions{display:flex;gap:6px}
+.user-card-actions button{background:rgba(255,255,255,.2);border:none;color:#fff;
+  padding:6px 10px;border-radius:var(--r);font-size:11px;font-weight:600;cursor:pointer}
+.user-card-actions button:hover{background:rgba(255,255,255,.3)}
+.user-card-body{padding:20px}
+.user-info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.info-item{display:flex;flex-direction:column;gap:2px}
+.info-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.info-value{font-size:13px;font-weight:500;color:var(--text)}
+
+/* User notes */
+.user-notes{background:var(--surface-2);border-radius:var(--r);padding:12px;margin-bottom:16px}
+.user-notes-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);
+                  margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.user-notes-list{display:flex;flex-direction:column;gap:6px}
+.user-note{display:flex;gap:8px;align-items:flex-start;font-size:12px;padding:8px;
+           background:var(--surface);border-radius:var(--r);border-left:3px solid var(--warn)}
+.user-note.alert{border-left-color:var(--error)}
+.user-note.info{border-left-color:var(--info)}
+.user-note-date{color:var(--muted);font-size:10px;margin-top:4px}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:20px;right:20px;z-index:1000;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:12px 16px;box-shadow:var(--shadow-lg);max-width:320px;font-size:13px;
+  display:flex;align-items:center;gap:10px;
+  transform:translateY(80px);opacity:0;transition:all .25s cubic-bezier(.16,1,.3,1);
+}
+#toast.show{transform:none;opacity:1}
+#toast.success{border-left:3px solid var(--success)}
+#toast.error{border-left:3px solid var(--error)}
+
+/* Loading */
+.spinner{width:20px;height:20px;border:2px solid var(--border);
+         border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{display:flex;align-items:center;justify-content:center;gap:10px;
+             padding:32px;color:var(--muted);font-size:13px}
+
+/* Empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;
+             padding:40px 20px;color:var(--muted)}
+.empty-state svg{margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:13px;max-width:28ch}
+
+/* Stats mini */
+.stats-mini{display:flex;gap:16px;margin-top:12px}
+.stat-mini{display:flex;flex-direction:column}
+.stat-mini-value{font-size:18px;font-weight:700;color:var(--primary)}
+.stat-mini-label{font-size:10px;color:var(--muted);text-transform:uppercase}
+
+/* Mobile sidebar toggle */
+#menu-btn{display:none}
+@media(max-width:680px){
+  #sidebar{position:fixed;top:0;left:0;height:100%;z-index:100;
+           transform:translateX(-100%);transition:transform var(--tr)}
+  #sidebar.open{transform:none;box-shadow:var(--shadow-lg)}
+  #menu-btn{display:flex}
+  #content{padding:16px}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .topbar-search{display:none}
+  .quick-actions{flex-direction:column}
+  .quick-action{width:100%}
+}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;
+               align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:var(--r-lg);width:100%;max-width:500px;
+       max-height:90vh;overflow:hidden;box-shadow:var(--shadow-lg)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;
+              align-items:center;justify-content:space-between}
+.modal-header h3{font-size:15px;font-weight:700}
+.modal-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+             border-radius:var(--r);cursor:pointer}
+.modal-close:hover{background:var(--surface-2)}
+.modal-body{padding:20px;overflow-y:auto;max-height:calc(90vh - 120px)}
+.modal-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <path d="M12 10v6" stroke-linecap="round"/>
+        <ellipse cx="12" cy="9" rx="1" ry="1.5" fill="currentColor"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Oficina Energia</div>
+      <div class="logo-sub">Sant Adria de Besos</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Principal</div>
+    <div class="nav-item active" data-view="dashboard">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      Dashboard
+    </div>
+    <div class="nav-item" data-view="nova-atencio">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      Nova Atencio
+    </div>
+    <div class="nav-item" data-view="cerca">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      Cerca Usuari
+    </div>
+    <div class="nav-label" style="margin-top:8px">Seguiment</div>
+    <div class="nav-item" data-view="gestions">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      Gestions Pendents
+      <span class="nav-badge" id="pending-badge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" data-view="registres">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/>
+      </svg>
+      Historial
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="nav-item" style="width:100%" onclick="toggleTheme()">
+      <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+      Mode fosc
+    </button>
+    <div style="margin-top:12px;padding:10px;border-top:1px solid var(--border);text-align:center">
+      <div style="font-size:9px;color:var(--faint);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">
+        Un projecte de
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;opacity:0.7">
+        <svg width="70" height="24" viewBox="0 0 100 30" fill="none">
+          <rect x="0" y="0" width="100" height="30" rx="2" fill="var(--primary)"/>
+          <text x="50" y="18" font-size="8" fill="white" text-anchor="middle" font-weight="600">AJUNTAMENT</text>
+          <text x="50" y="26" font-size="6" fill="white" text-anchor="middle">Sant Adria de Besos</text>
+        </svg>
+        <svg width="36" height="24" viewBox="0 0 50 30" fill="none">
+          <rect x="0" y="0" width="50" height="30" rx="2" fill="#c41e5c"/>
+          <text x="25" y="18" font-size="10" fill="white" text-anchor="middle" font-weight="700">AMB</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <header id="topbar">
+    <button id="menu-btn" class="btn-icon" onclick="toggleSidebar()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <span id="page-title">Dashboard</span>
+    
+    <!-- Global Search -->
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="global-search" placeholder="Cercar usuari per nom o DNI..." 
+             oninput="globalSearch(this.value)" onblur="setTimeout(()=>hideGlobalSearch(),200)">
+      <div class="topbar-search-results" id="global-search-results"></div>
+    </div>
+    
+    <span style="flex:1"></span>
+    <button class="btn btn-primary" onclick="navigate('nova-atencio')" style="height:30px;font-size:12px">
+      + Nova Atencio
+    </button>
+  </header>
+
+  <div id="content">
+
+    <!-- ── DASHBOARD ──────────────────────────────── -->
+    <div class="view active" id="view-dashboard">
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <div class="quick-action" onclick="navigate('nova-atencio')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          Nova atencio
+        </div>
+        <div class="quick-action" onclick="navigate('cerca')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Cercar usuari
+        </div>
+        <div class="quick-action" onclick="navigate('gestions')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+          Gestions pendents
+        </div>
+        <div class="quick-action" onclick="exportData()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Exportar dades
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div id="dashboard-alerts"></div>
+      
+      <div id="kpi-area">
+        <div class="loading-row"><div class="spinner"></div> Carregant estadistiques...</div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            </svg>
+            Atencions per tecnic
+          </div>
+          <div id="chart-tecnic"><div class="loading-row"><div class="spinner"></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+            </svg>
+            Atencions per derivacio
+          </div>
+          <div id="chart-derivacio"><div class="loading-row"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Ultimes atencions
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>Data</th><th>Nom</th><th>DNI</th><th>Derivacio</th><th>Tecnic</th><th></th>
+            </tr></thead>
+            <tbody id="dash-table-body">
+              <tr><td colspan="6"><div class="loading-row"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NOVA ATENCIÓ ───────────────────────────── -->
+    <div class="view" id="view-nova-atencio">
+      <!-- Step indicator -->
+      <div class="steps">
+        <div class="step active" id="step1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step" id="step2">2</div>
+        <div class="step-line" id="line2"></div>
+        <div class="step" id="step3">3</div>
+        <span style="margin-left:8px;font-size:12px;color:var(--muted)" id="step-label">Identificacio</span>
+      </div>
+
+      <!-- STEP 1: DNI lookup -->
+      <div id="step-1" class="card">
+        <div class="form-section-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Verificacio DNI / NIE
+        </div>
+        <div class="dni-search-wrap">
+          <input class="inp" id="input-dni" placeholder="12345678A" maxlength="12"
+                 oninput="this.value=this.value.toUpperCase()"
+                 onkeydown="if(event.key==='Enter')lookupDNI()">
+          <button class="btn btn-primary btn-lg" onclick="lookupDNI()" id="btn-lookup">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Verificar
+          </button>
+        </div>
+        <div id="lookup-result" style="display:none"></div>
+      </div>
+
+      <!-- STEP 2: User + attention data -->
+      <div id="step-2" style="display:none">
+        <div class="card">
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            Dades personals
+          </div>
+          <div id="user-banner" class="user-found" style="display:none"></div>
+          <div class="form-grid">
+            <div class="field"><label>Nom i Cognoms <span class="req">*</span></label>
+              <input class="inp" id="f-nom" required></div>
+            <div class="field"><label>Genere <span class="req">*</span></label>
+              <select class="inp" id="f-genere">
+                <option value="">Selecciona...</option>
+                <option>D</option><option>H</option><option>D / H</option>
+                <option>No especificat</option>
+              </select></div>
+            <div class="field"><label>Lloc de Naixement</label>
+              <select class="inp" id="f-lloc">
+                <option value="">Selecciona...</option>
+                <option>Catalunya</option><option>Resta d'Espanya</option>
+                <option>Europa</option><option>Africa</option>
+                <option>America Llatina</option><option>Asia</option><option>Altres</option>
+              </select></div>
+            <div class="field"><label>Persones habitatge</label>
+              <input class="inp" id="f-persones" type="number" min="1" max="20"></div>
+            <div class="field"><label>Barri <span class="req">*</span></label>
+              <select class="inp" id="f-barri">
+                <option value="">Selecciona...</option>
+                <option>Mina</option><option>Sant Joan Batista</option>
+                <option>Besos</option><option>Sant Adria Nord</option>
+                <option>Trajana</option><option>La Catalana</option><option>Altres</option>
+              </select></div>
+            <div class="field"><label>Tinenca <span class="req">*</span></label>
+              <select class="inp" id="f-tinenca">
+                <option value="">Selecciona...</option>
+                <option>Propietat</option><option>Lloguer</option><option>Altres</option>
+              </select></div>
+            <div class="field"><label>Adreca</label>
+              <input class="inp" id="f-adreca"></div>
+            <div class="field"><label>Telefon</label>
+              <input class="inp" id="f-telf" type="tel"></div>
+            <div class="field"><label>Email</label>
+              <input class="inp" id="f-email" type="email"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            Dades de l'atencio
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>Derivacio <span class="req">*</span></label>
+              <select class="inp" id="f-derivacio">
+                <option value="">Selecciona...</option>
+                <option>Publicitat</option><option>Serveis Socials</option>
+                <option>Entitats Socials</option><option>Altres</option>
+                <option>Tallers</option><option>CAP</option>
+                <option>Oficina Habitatge</option>
+              </select></div>
+            <div class="field"><label>Qui rep? <span class="req">*</span></label>
+              <select class="inp" id="f-qui-rep">
+                <option value="">Selecciona...</option>
+                <option>Marta</option><option>Karina</option><option>Ricard</option>
+                <option>Norfa</option><option>Esther</option><option>Altres</option>
+              </select></div>
+            <div class="field"><label>Referent</label>
+              <select class="inp" id="f-referent">
+                <option value="">Selecciona...</option>
+                <option>Serveis Socials</option>
+                <option>Entitat Social</option>
+                <option>Pla De Besos</option>
+                <option>No Derivat</option>
+                <option>Altres</option>
+              </select></div>
+            <div class="field"><label>Cal assessorament?</label>
+              <select class="inp" id="f-cal-ass">
+                <option value="">-</option>
+                <option>Si</option><option>No</option><option>Pendent</option>
+              </select></div>
+          </div>
+          <div style="margin-top:12px" class="field">
+            <label>Circumstancies especials</label>
+            <div class="check-grid" style="margin-top:6px">
+              <label class="check-item"><input type="checkbox" name="circ" value="Vulnerabilitat energetica"> Vulnerabilitat energetica</label>
+              <label class="check-item"><input type="checkbox" name="circ" value="Risc d'exclusio social"> Risc d'exclusio social</label>
+              <label class="check-item"><input type="checkbox" name="circ" value="Familia monoparental"> Familia monoparental</label>
+              <label class="check-item"><input type="checkbox" name="circ" value="Persona gran"> Persona gran</label>
+              <label class="check-item"><input type="checkbox" name="circ" value="Discapacitat"> Discapacitat</label>
+            </div>
+          </div>
+          <div style="margin-top:12px" class="field">
+            <label>Observacions rellevants</label>
+            <textarea class="inp" id="f-obs" rows="3" placeholder="Informacio addicional..."></textarea>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goStep(1)">Tornar</button>
+          <button class="btn btn-primary" onclick="goStep(3)">Continuar</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Assessoraments -->
+      <div id="step-3" style="display:none">
+        <div class="card">
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
+            </svg>
+            Assessoraments realitzats
+          </div>
+          <div class="check-grid">
+            <div class="check-group-title">Llum / Electricitat</div>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat llum"> Canvi titularitat llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi comercialitzadora llum"> Canvi comercialitzadora llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Mercat lliure a mercat regulat"> Mercat lliure → regulat</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Potencia reduida"> Potencia reduida</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Eliminacio serveis extres llum"> Eliminacio serveis extres</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Bo social"> Bo social</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Nou bo social"> Nou bo social</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu llum"> Tall efectiu llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Bo termic"> Bo termic</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Punxada llum"> Punxada llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Desconnexio llum"> Desconnexio llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Negociar deute llum"> Negociar deute llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Alta llum"> Alta llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Treva llum"> Treva llum</label>
+            <div class="check-group-title">Gas</div>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat gas"> Canvi titularitat gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi comercialitzadora gas"> Canvi comercialitzadora gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Mercat lliure a TUR"> Mercat lliure → TUR</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Eliminacio serveis extres gas"> Eliminacio serveis extres</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu gas"> Tall efectiu gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Punxada gas"> Punxada gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Desconnexio gas"> Desconnexio gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Gestio de trams"> Gestio de trams</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canon social"> Canon social</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Treva gas"> Treva gas</label>
+            <div class="check-group-title">Aigua</div>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat aigua"> Canvi titularitat aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Ajuda MUSA (comptadors)"> Ajuda MUSA (comptadors)</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu aigua"> Tall efectiu aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Punxada aigua"> Punxada aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Desconnexio aigua"> Desconnexio aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Alta aigua"> Alta aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Negociar deute aigua"> Negociar deute aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="IRER enviat"> IRER enviat</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Treva aigua"> Treva aigua</label>
+            <div class="check-group-title">Altres gestions</div>
+            <label class="check-item"><input type="checkbox" name="assess" value="Projecte Porta a Porta"> Projecte Porta a Porta</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="ONA"> ONA</label>
+          </div>
+        </div>
+        <!-- Nota adicional -->
+        <div class="card">
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Nota interna (opcional)
+          </div>
+          <textarea class="inp" id="f-nota-interna" rows="2" placeholder="Afegeix una nota interna per a seguiment futur..."></textarea>
+          <div style="margin-top:8px">
+            <label class="check-item" style="display:inline-flex">
+              <input type="checkbox" id="f-nota-alerta"> Marcar com a alerta important
+            </label>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goStep(2)">Tornar</button>
+          <button class="btn btn-primary btn-lg" id="btn-submit" onclick="submitForm()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+            Guardar atencio
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CERCA USUARI ───────────────────────────── -->
+    <div class="view" id="view-cerca">
+      <div class="card">
+        <div class="form-section-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Cerca per DNI / NIE
+        </div>
+        <div class="dni-search-wrap">
+          <input class="inp" id="search-dni" placeholder="12345678A" maxlength="12"
+                 oninput="this.value=this.value.toUpperCase()"
+                 onkeydown="if(event.key==='Enter')searchUser()">
+          <button class="btn btn-primary btn-lg" onclick="searchUser()">Cercar</button>
+        </div>
+      </div>
+      <div id="search-result"></div>
+    </div>
+
+    <!-- ── GESTIONS PENDENTS ──────────────────────── -->
+    <div class="view" id="view-gestions">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+          <div class="card-title" style="margin:0 0 12px 0">Seguiment de Gestions</div>
+          <div class="filter-bar">
+            <select id="filter-tipus" onchange="filterGestions()">
+              <option value="">Tots els tipus</option>
+              <option value="llum">Llum / Electricitat</option>
+              <option value="gas">Gas</option>
+              <option value="aigua">Aigua</option>
+              <option value="altres">Altres</option>
+            </select>
+            <select id="filter-estat" onchange="filterGestions()">
+              <option value="">Tots els estats</option>
+              <option value="pendent">Pendent</option>
+              <option value="en-curs">En curs</option>
+              <option value="completat">Completat</option>
+            </select>
+            <select id="filter-tecnic" onchange="filterGestions()">
+              <option value="">Tots els tecnics</option>
+              <option>Marta</option><option>Karina</option><option>Ricard</option>
+              <option>Norfa</option><option>Esther</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="loadGestions()">Actualitzar</button>
+          </div>
+        </div>
+        <div class="tbl-wrap" style="border:none;border-radius:0">
+          <table>
+            <thead><tr>
+              <th style="width:30px"></th>
+              <th>Data</th><th>Usuari</th><th>Gestio</th>
+              <th>Estat</th><th>Tecnic</th><th>Accions</th>
+            </tr></thead>
+            <tbody id="gestions-body">
+              <tr><td colspan="7"><div class="loading-row"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORIAL / ÚLTIMS REGISTRES ───────────────────────── -->
+    <div class="view" id="view-registres">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div class="card-title" style="margin:0">Historial d'atencions</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="date" class="inp" id="filter-date-from" style="height:32px;font-size:12px" onchange="loadRegistres()">
+            <span style="color:var(--muted);font-size:12px">a</span>
+            <input type="date" class="inp" id="filter-date-to" style="height:32px;font-size:12px" onchange="loadRegistres()">
+            <button class="btn btn-secondary" style="height:32px;font-size:12px" onclick="loadRegistres()">
+              Actualitzar
+            </button>
+          </div>
+        </div>
+        <div class="tbl-wrap" style="border:none;border-radius:0">
+          <table>
+            <thead><tr>
+              <th style="width:30px"></th>
+              <th>#</th><th>Data</th><th>Nom</th><th>DNI</th>
+              <th>Derivacio</th><th>Tecnic</th><th>Assessorament?</th>
+            </tr></thead>
+            <tbody id="registres-body">
+              <tr><td colspan="8"><div class="loading-row"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Modal for notes -->
+<div class="modal-overlay" id="modal-nota">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Afegir nota</h3>
+      <div class="modal-close" onclick="closeModal('modal-nota')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Tipus de nota</label>
+        <select class="inp" id="modal-nota-tipus">
+          <option value="info">Informacio</option>
+          <option value="warning">Avis</option>
+          <option value="alert">Alerta urgent</option>
+        </select>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>Contingut</label>
+        <textarea class="inp" id="modal-nota-text" rows="4" placeholder="Escriu la nota..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-nota')">Cancel·lar</button>
+      <button class="btn btn-primary" onclick="saveNota()">Guardar nota</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────
+let currentStep = 1;
+let currentDNI  = '';
+let isDarkMode  = false;
+let statsLoaded = false;
+let allUsers = []; // Cache para busqueda global
+let currentModalDNI = '';
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function navigate(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  const navItem = document.querySelector(`[data-view="${view}"]`);
+  if (navItem) navItem.classList.add('active');
+
+  const titles = {
+    'dashboard':   'Dashboard',
+    'nova-atencio':'Nova Atencio',
+    'cerca':       'Cerca Usuari',
+    'gestions':    'Gestions Pendents',
+    'registres':   'Historial'
+  };
+  document.getElementById('page-title').textContent = titles[view] || view;
+
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+
+  if (view === 'dashboard' && !statsLoaded) loadDashboard();
+  if (view === 'registres') loadRegistres();
+  if (view === 'gestions') loadGestions();
+}
+
+document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+  el.addEventListener('click', () => navigate(el.dataset.view));
+});
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── THEME ─────────────────────────────────────────────────────
+function toggleTheme() {
+  isDarkMode = !isDarkMode;
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  document.querySelector('.nav-item[onclick="toggleTheme()"]').querySelector('svg').innerHTML =
+    isDarkMode
+      ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+      : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + (type || '');
+  setTimeout(() => { t.className = ''; }, 3500);
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// ── API HELPER ────────────────────────────────────────────────
+async function apiFetch(url, options) {
+  const res = await fetch(url, options);
+  return res.json();
+}
+
+// ── GLOBAL SEARCH ─────────────────────────────────────────────
+function globalSearch(query) {
+  const results = document.getElementById('global-search-results');
+  if (query.length < 2) {
+    results.classList.remove('show');
+    return;
+  }
+  
+  if (allUsers.length === 0) {
+    apiFetch('/api/users').then(r => {
+      if (r.ok) {
+        allUsers = r.users || [];
+        performGlobalSearch(query);
+      }
+    });
+  } else {
+    performGlobalSearch(query);
+  }
+}
+
+function performGlobalSearch(query) {
+  const results = document.getElementById('global-search-results');
+  const q = query.toUpperCase();
+  const matches = allUsers.filter(u => 
+    (u.NOM && u.NOM.toUpperCase().includes(q)) || 
+    (u.DNI && u.DNI.toUpperCase().includes(q))
+  ).slice(0, 5);
+  
+  if (matches.length === 0) {
+    results.innerHTML = '<div class="search-result-item"><span style="color:var(--muted)">Cap resultat trobat</span></div>';
+  } else {
+    results.innerHTML = matches.map(u => `
+      <div class="search-result-item" onclick="openUser('${u.DNI}')">
+        <div>
+          <div class="search-result-name">${u.NOM || '-'}</div>
+          <div class="search-result-dni">${u.DNI}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  results.classList.add('show');
+}
+
+function hideGlobalSearch() {
+  document.getElementById('global-search-results').classList.remove('show');
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function loadDashboard() {
+  apiFetch('/api/dashboard').then(renderDashboard).catch(e => showToast('Error: ' + e.message, 'error'));
+}
+
+function renderDashboard(d) {
+  if (!d.ok) { showToast('Error: ' + d.error, 'error'); return; }
+  statsLoaded = true;
+
+  // Alerts
+  const alertsHtml = [];
+  if (d.pendingGestions && d.pendingGestions > 0) {
+    alertsHtml.push(`
+      <div class="alert-banner warning">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        Hi ha <strong>${d.pendingGestions}</strong> gestions pendents de seguiment.
+        <a href="#" onclick="navigate('gestions');return false" style="margin-left:auto;color:inherit;font-weight:600">Veure</a>
+      </div>
+    `);
+  }
+  document.getElementById('dashboard-alerts').innerHTML = alertsHtml.join('');
+
+  // Update pending badge
+  const badge = document.getElementById('pending-badge');
+  if (d.pendingGestions && d.pendingGestions > 0) {
+    badge.textContent = d.pendingGestions;
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  // KPIs
+  const mesAnterior = d.atencionesMesAnterior || 0;
+  const diff = d.atencionesMes - mesAnterior;
+  const trendHtml = mesAnterior > 0 ? `<span class="kpi-trend ${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '+' : ''}${diff}</span>` : '';
+  
+  document.getElementById('kpi-area').innerHTML = `
+    <div class="kpi-grid">
+      <div class="kpi-card accent" onclick="navigate('cerca')">
+        <div class="kpi-label">Total usuaris</div>
+        <div class="kpi-value">${d.totalUsuaris}</div>
+        <div class="kpi-sub">usuaris unics (DNI)</div>
+      </div>
+      <div class="kpi-card" onclick="navigate('registres')">
+        <div class="kpi-label">Total atencions</div>
+        <div class="kpi-value">${d.totalAtencions}</div>
+        <div class="kpi-sub">des de l'inici</div>
+      </div>
+      <div class="kpi-card" onclick="navigate('registres')">
+        <div class="kpi-label">Aquest mes</div>
+        <div class="kpi-value">${d.atencionesMes}${trendHtml}</div>
+        <div class="kpi-sub">atencions al mes actual</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tecnics actius</div>
+        <div class="kpi-value">${Object.keys(d.perTecnic).length}</div>
+        <div class="kpi-sub">professionals</div>
+      </div>
+    </div>`;
+
+  // Chart tecnics
+  renderBarChart('chart-tecnic', d.perTecnic);
+  // Chart derivacio
+  renderBarChart('chart-derivacio', d.perDerivacio);
+
+  // Table with expandable rows
+  const rows = d.ultimes.map(r => `
+    <tr onclick="openUser('${r.dni}')">
+      <td>${r.fecha}</td>
+      <td><strong>${r.nom}</strong></td>
+      <td class="td-mono">${r.dni}</td>
+      <td>${badgeDerivacio(r.derivacio)}</td>
+      <td class="td-muted">${r.quiRep}</td>
+      <td>
+        <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();newAtencioForUser('${r.dni}')">
+          + Atencio
+        </button>
+      </td>
+    </tr>`).join('');
+  document.getElementById('dash-table-body').innerHTML = rows ||
+    '<tr><td colspan="6"><div class="empty-state"><p>Cap atencio registrada</p></div></td></tr>';
+}
+
+function renderBarChart(elId, data) {
+  const total = Object.values(data).reduce((a,b)=>a+b,0);
+  const sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const html = '<div class="bar-list">' + sorted.map(([label, val]) => `
+    <div class="bar-item">
+      <div class="bar-label"><span>${label}</span><span>${val}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(val/total*100)}%"></div></div>
+    </div>`).join('') + '</div>';
+  document.getElementById(elId).innerHTML = html;
+}
+
+function badgeDerivacio(d) {
+  const map = {
+    'Publicitat':'badge-blue',
+    'Serveis Socials':'badge-green',
+    'Entitats Socials':'badge-purple',
+    'Entitat Social':'badge-purple',
+    'CAP':'badge-orange',
+    'Oficina Habitatge':'badge-orange',
+    'Pla De Besos':'badge-green',
+    'No Derivat':'badge-blue',
+    'Altres':'badge-blue',
+    'Tallers':'badge-purple'
+  };
+  const cls = map[d] || 'badge-blue';
+  return `<span class="badge ${cls}">${d}</span>`;
+}
+
+function badgeEstat(estat) {
+  const map = {
+    'pendent': 'badge-yellow',
+    'en-curs': 'badge-blue',
+    'completat': 'badge-green'
+  };
+  const labels = {
+    'pendent': 'Pendent',
+    'en-curs': 'En curs',
+    'completat': 'Completat'
+  };
+  return `<span class="badge ${map[estat] || 'badge-blue'}">${labels[estat] || estat}</span>`;
+}
+
+// ── DNI LOOKUP (Nova Atenció) ─────────────────────────────────
+function lookupDNI() {
+  const dni = document.getElementById('input-dni').value.trim();
+  if (dni.length < 8) { showToast('Introdueix un DNI/NIE valid', 'error'); return; }
+  currentDNI = dni.toUpperCase();
+
+  const btn = document.getElementById('btn-lookup');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+
+  apiFetch('/api/user/' + encodeURIComponent(currentDNI))
+    .then(r => { btn.disabled=false; btn.innerHTML='Verificar'; handleLookup(r); })
+    .catch(e => { btn.disabled=false; btn.innerHTML='Verificar'; showToast(e.message,'error'); });
+}
+
+function handleLookup(r) {
+  const el = document.getElementById('lookup-result');
+  el.style.display = 'block';
+
+  if (r.ok === false) {
+    el.innerHTML = `<div class="user-found" style="border-color:var(--error);color:var(--error)">
+      Error en la cerca: ${r.error}
+    </div>`;
+    return;
+  }
+
+  if (r.trobat) {
+    const u = r.usuari;
+    el.innerHTML = `<div class="user-found">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/>
+      </svg>
+      <strong>${u.NOM}</strong> - usuari existent - ${r.totalAtencions} atencions previes
+    </div>`;
+    prefillForm(u);
+    goStep(2);
+  } else {
+    el.innerHTML = `<div class="user-found user-new">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      Usuari nou - Completa les dades personals
+    </div>`;
+    clearForm();
+    goStep(2);
+  }
+}
+
+function prefillForm(u) {
+  const set = (id, val) => { const el=document.getElementById(id); if(el&&val) el.value=val; };
+  set('f-nom',     u.NOM);
+  set('f-genere',  u.GENERE);
+  set('f-lloc',    u['LLOC DE NAIXEMENT']);
+  set('f-persones',u['TOTAL PERSONES HABITATGE']);
+  set('f-barri',   u.BARRI);
+  set('f-tinenca', u.TINENCA);
+  set('f-adreca',  u.ADRECA);
+  set('f-telf',    u['TELF. 1']);
+  set('f-email',   u['E-MAIL']);
+
+  document.getElementById('user-banner').style.display = 'flex';
+  document.getElementById('user-banner').innerHTML = `
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+    </svg>
+    Usuari trobat: <strong>${u.NOM}</strong> - DNI: ${u.DNI}. Pots actualitzar les dades si cal.`;
+}
+
+function clearForm() {
+  ['f-nom','f-genere','f-lloc','f-persones','f-barri','f-tinenca','f-adreca','f-telf','f-email',
+   'f-derivacio','f-qui-rep','f-referent','f-cal-ass','f-obs','f-nota-interna'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.querySelectorAll('[name="circ"],[name="assess"]').forEach(cb => cb.checked = false);
+  document.getElementById('f-nota-alerta').checked = false;
+  document.getElementById('user-banner').style.display = 'none';
+}
+
+// ── STEP NAVIGATION ───────────────────────────────────────────
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('step-'+i).style.display = i===n ? 'block' : 'none';
+    const stepEl = document.getElementById('step'+i);
+    stepEl.className = 'step ' + (i < n ? 'done' : i===n ? 'active' : '');
+  });
+  [1,2].forEach(i => {
+    document.getElementById('line'+i).className = 'step-line ' + (i < n ? 'done' : '');
+  });
+  const labels = {1:'Identificacio',2:'Dades i atencio',3:'Assessoraments'};
+  document.getElementById('step-label').textContent = labels[n];
+  currentStep = n;
+  document.getElementById('content').scrollTop = 0;
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+function submitForm() {
+  const required = [
+    {id:'f-nom',label:'Nom'},
+    {id:'f-genere',label:'Genere'},
+    {id:'f-barri',label:'Barri'},
+    {id:'f-tinenca',label:'Tinenca'},
+    {id:'f-derivacio',label:'Derivacio'},
+    {id:'f-qui-rep',label:'Qui rep'}
+  ];
+  for (const {id,label} of required) {
+    if (!document.getElementById(id).value) {
+      showToast(`Camp obligatori: ${label}`, 'error');
+      goStep(2); return;
+    }
+  }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Guardant...';
+
+  const assessos = [...document.querySelectorAll('[name="assess"]:checked')].map(c=>c.value);
+  const circs    = [...document.querySelectorAll('[name="circ"]:checked')].map(c=>c.value);
+
+  const fd = {
+    dni:           currentDNI,
+    nom:           document.getElementById('f-nom').value,
+    genere:        document.getElementById('f-genere').value,
+    llocNaix:      document.getElementById('f-lloc').value,
+    persones:      document.getElementById('f-persones').value,
+    barri:         document.getElementById('f-barri').value,
+    tinenca:       document.getElementById('f-tinenca').value,
+    adreca:        document.getElementById('f-adreca').value,
+    telf:          document.getElementById('f-telf').value,
+    email:         document.getElementById('f-email').value,
+    derivacio:     document.getElementById('f-derivacio').value,
+    quiRep:        document.getElementById('f-qui-rep').value,
+    referent:      document.getElementById('f-referent').value,
+    calAssessorament: document.getElementById('f-cal-ass').value,
+    circumstancies: circs,
+    observacions:  document.getElementById('f-obs').value,
+    assessoraments: assessos,
+    notaInterna:   document.getElementById('f-nota-interna').value,
+    notaAlerta:    document.getElementById('f-nota-alerta').checked
+  };
+
+  apiFetch('/api/atencio', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(fd)
+  }).then(r => {
+    btn.disabled = false;
+    btn.innerHTML = 'Guardar atencio';
+    if (r.ok) {
+      showToast(r.missatge, 'success');
+      statsLoaded = false;
+      clearForm();
+      goStep(1);
+      document.getElementById('input-dni').value = '';
+      document.getElementById('lookup-result').style.display = 'none';
+      document.getElementById('step-2').style.display = 'none';
+      document.getElementById('step-3').style.display = 'none';
+      document.getElementById('step-1').style.display = 'block';
+      currentStep = 1;
+      [1,2,3].forEach(i => { document.getElementById('step'+i).className='step'+(i===1?' active':''); });
+      document.getElementById('step-label').textContent = 'Identificacio';
+    } else {
+      showToast('Error: ' + r.error, 'error');
+    }
+  }).catch(e => {
+    btn.disabled = false;
+    btn.innerHTML = 'Guardar atencio';
+    showToast('Error: ' + e.message, 'error');
+  });
+}
+
+// ── CERCA USUARI ──────────────────────────────────────────────
+function searchUser() {
+  const dni = document.getElementById('search-dni').value.trim().toUpperCase();
+  if (dni.length < 8) { showToast('Introdueix un DNI/NIE valid', 'error'); return; }
+  document.getElementById('search-result').innerHTML =
+    '<div class="loading-row"><div class="spinner"></div> Cercant...</div>';
+
+  apiFetch('/api/user/' + encodeURIComponent(dni)).then(renderUserCard).catch(e => showToast(e.message,'error'));
+}
+
+function renderUserCard(r) {
+  const el = document.getElementById('search-result');
+  if (!r.trobat) {
+    el.innerHTML = `<div class="empty-state">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <line x1="8" y1="11" x2="14" y2="11"/>
+      </svg>
+      <p>No s'ha trobat cap usuari amb aquest DNI/NIE</p>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="navigate('nova-atencio')">+ Crear usuari nou</button>
+    </div>`;
+    return;
+  }
+  const u = r.usuari;
+  
+  // Notas del usuario
+  const notesHtml = r.notes && r.notes.length ? `
+    <div class="user-notes">
+      <div class="user-notes-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Notes internes
+      </div>
+      <div class="user-notes-list">
+        ${r.notes.map(n => `
+          <div class="user-note ${n.tipus}">
+            <div>
+              <div>${n.text}</div>
+              <div class="user-note-date">${n.fecha} - ${n.autor}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const histHtml = r.historial.length ? r.historial.map(h => `
+    <tr class="expandable-row" onclick="toggleExpand(this)">
+      <td style="width:24px">
+        <svg class="expand-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9,18 15,12 9,6"/>
+        </svg>
+      </td>
+      <td>${h.fecha}</td>
+      <td>${badgeDerivacio(h.derivacio)}</td>
+      <td class="td-muted">${h.quiRep}</td>
+      <td class="td-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.observ}</td>
+    </tr>
+    <tr style="display:none" class="expand-row">
+      <td colspan="5">
+        <div class="expand-content">
+          <strong>Assessoraments realitzats:</strong>
+          <div class="expand-tags">
+            ${h.assessoraments && h.assessoraments.length ? h.assessoraments.map(a => `<span class="expand-tag">${a}</span>`).join('') : '<span style="color:var(--muted)">Cap assessorament registrat</span>'}
+          </div>
+          ${h.observ ? `<div style="margin-top:10px"><strong>Observacions:</strong> ${h.observ}</div>` : ''}
+        </div>
+      </td>
+    </tr>
+    `).join('') :
+    '<tr><td colspan="5" class="td-muted" style="padding:16px;text-align:center">Cap atencio registrada</td></tr>';
+
+  el.innerHTML = `
+    <div class="user-card">
+      <div class="user-card-header">
+        <div>
+          <h2>${u.NOM || '-'}</h2>
+          <div class="sub">DNI: ${u.DNI} - ${r.totalAtencions} atencions - Barri: ${u.BARRI || '-'}</div>
+        </div>
+        <div class="user-card-actions">
+          <button onclick="openNotaModal('${u.DNI}')">+ Nota</button>
+          <button onclick="newAtencioForUser('${u.DNI}')">+ Atencio</button>
+        </div>
+      </div>
+      <div class="user-card-body">
+        ${notesHtml}
+        <div class="user-info-grid">
+          <div class="info-item"><div class="info-label">Genere</div><div class="info-value">${u.GENERE||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Lloc Naix.</div><div class="info-value">${u['LLOC DE NAIXEMENT']||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Barri</div><div class="info-value">${u.BARRI||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Tinenca</div><div class="info-value">${u.TINENCA||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Persones</div><div class="info-value">${u['TOTAL PERSONES HABITATGE']||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Telefon</div><div class="info-value">${u['TELF. 1']||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Email</div><div class="info-value" style="font-size:12px">${u['E-MAIL']||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Adreca</div><div class="info-value" style="font-size:12px">${u.ADRECA||'-'}</div></div>
+        </div>
+        <div class="card-title" style="margin-top:16px;margin-bottom:10px">Historial d'atencions</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th style="width:24px"></th><th>Data</th><th>Derivacio</th><th>Tecnic</th><th>Observacions</th></tr></thead>
+            <tbody>${histHtml}</tbody>
+          </table>
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn btn-primary" onclick="newAtencioForUser('${u.DNI}')">+ Nova atencio</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('search-result').innerHTML=''">Tancar</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function toggleExpand(row) {
+  const nextRow = row.nextElementSibling;
+  if (nextRow && nextRow.classList.contains('expand-row')) {
+    row.classList.toggle('expanded');
+    const content = nextRow.querySelector('.expand-content');
+    if (row.classList.contains('expanded')) {
+      nextRow.style.display = 'table-row';
+      content.classList.add('show');
+    } else {
+      nextRow.style.display = 'none';
+      content.classList.remove('show');
+    }
+  }
+}
+
+function openUser(dni) {
+  document.getElementById('search-dni').value = dni;
+  navigate('cerca');
+  searchUser();
+}
+
+function newAtencioForUser(dni) {
+  document.getElementById('input-dni').value = dni;
+  navigate('nova-atencio');
+  lookupDNI();
+}
+
+function openNotaModal(dni) {
+  currentModalDNI = dni;
+  document.getElementById('modal-nota-text').value = '';
+  document.getElementById('modal-nota-tipus').value = 'info';
+  openModal('modal-nota');
+}
+
+function saveNota() {
+  const text = document.getElementById('modal-nota-text').value.trim();
+  const tipus = document.getElementById('modal-nota-tipus').value;
+  
+  if (!text) {
+    showToast('Escriu el contingut de la nota', 'error');
+    return;
+  }
+  
+  apiFetch('/api/nota', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dni: currentModalDNI, text, tipus })
+  }).then(r => {
+    if (r.ok) {
+      showToast('Nota guardada correctament', 'success');
+      closeModal('modal-nota');
+      searchUser();
+    } else {
+      showToast('Error: ' + r.error, 'error');
+    }
+  }).catch(e => showToast(e.message, 'error'));
+}
+
+// ── GESTIONS PENDENTS ─────────────────────────────────────────
+function loadGestions() {
+  document.getElementById('gestions-body').innerHTML =
+    '<tr><td colspan="7"><div class="loading-row"><div class="spinner"></div></div></td></tr>';
+  
+  apiFetch('/api/gestions').then(renderGestions).catch(e => showToast(e.message,'error'));
+}
+
+function renderGestions(d) {
+  if (!d.ok) { showToast('Error: ' + d.error,'error'); return; }
+  
+  const rows = d.rows.map(r => `
+    <tr onclick="openUser('${r.dni}')">
+      <td>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${r.tipus === 'llum' ? '#f57f17' : r.tipus === 'gas' ? '#ef6c00' : '#1565c0'}" stroke-width="2">
+          ${r.tipus === 'llum' ? '<polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>' : 
+            r.tipus === 'gas' ? '<path d="M12 2c0 6.5-6 9-6 14a6 6 0 0012 0c0-5-6-7.5-6-14z"/>' :
+            '<path d="M12 2v6l3-3M12 8l-3-3M5 12H2l3-3M5 12l-3 3M19 12h3l-3-3M19 12l3 3M12 22v-6l3 3M12 16l-3 3"/>'}
+        </svg>
+      </td>
+      <td>${r.fecha}</td>
+      <td><strong>${r.nom}</strong><br><span class="td-mono">${r.dni}</span></td>
+      <td>${r.gestio}</td>
+      <td>${badgeEstat(r.estat)}</td>
+      <td class="td-muted">${r.tecnic}</td>
+      <td>
+        <button class="btn btn-sm btn-success" onclick="event.stopPropagation();updateGestioEstat('${r.id}','completat')" title="Completar">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20,6 9,17 4,12"/>
+          </svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+  
+  document.getElementById('gestions-body').innerHTML = rows ||
+    '<tr><td colspan="7"><div class="empty-state"><p>Cap gestio pendent</p></div></td></tr>';
+}
+
+function filterGestions() {
+  // En una implementacion real, esto filtraria los datos
+  loadGestions();
+}
+
+function updateGestioEstat(id, estat) {
+  apiFetch('/api/gestions/' + id + '/estat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ estat })
+  }).then(r => {
+    if (r.ok) {
+      showToast('Estat actualitzat', 'success');
+      loadGestions();
+    } else {
+      showToast('Error: ' + r.error, 'error');
+    }
+  }).catch(e => showToast(e.message, 'error'));
+}
+
+// ── ÚLTIMS REGISTRES ──────────────────────────────────────────
+function loadRegistres() {
+  document.getElementById('registres-body').innerHTML =
+    '<tr><td colspan="8"><div class="loading-row"><div class="spinner"></div></div></td></tr>';
+  
+  const dateFrom = document.getElementById('filter-date-from').value;
+  const dateTo = document.getElementById('filter-date-to').value;
+  
+  const params = new URLSearchParams({ limit: 50 });
+  if (dateFrom) params.set('dateFrom', dateFrom);
+  if (dateTo) params.set('dateTo', dateTo);
+  
+  apiFetch('/api/registres?' + params.toString()).then(renderRegistres).catch(e => showToast(e.message,'error'));
+}
+
+function renderRegistres(d) {
+  if (!d.ok) { showToast('Error: ' + d.error,'error'); return; }
+  const rows = d.rows.map(r => `
+    <tr class="expandable-row" onclick="toggleExpand(this)">
+      <td style="width:24px">
+        <svg class="expand-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9,18 15,12 9,6"/>
+        </svg>
+      </td>
+      <td class="td-muted" style="font-size:12px">#${r.id}</td>
+      <td>${r.fecha}</td>
+      <td><strong>${r.nom}</strong></td>
+      <td class="td-mono">${r.dni}</td>
+      <td>${badgeDerivacio(r.derivacio)}</td>
+      <td class="td-muted">${r.quiRep}</td>
+      <td>${r.calAss==='Si'?'<span class="badge badge-green">Si</span>':r.calAss==='No'?'<span class="badge badge-blue">No</span>':'<span class="badge" style="background:var(--surface-2);color:var(--muted)">'+r.calAss+'</span>'}</td>
+    </tr>
+    <tr style="display:none" class="expand-row">
+      <td colspan="8">
+        <div class="expand-content">
+          <strong>Assessoraments:</strong>
+          <div class="expand-tags">
+            ${r.assessoraments && r.assessoraments.length ? r.assessoraments.map(a => `<span class="expand-tag">${a}</span>`).join('') : '<span style="color:var(--muted)">Cap assessorament</span>'}
+          </div>
+          <div class="btn-row" style="margin-top:12px">
+            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();newAtencioForUser('${r.dni}')">+ Nova atencio</button>
+            <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();openUser('${r.dni}')">Veure perfil</button>
+          </div>
+        </div>
+      </td>
+    </tr>
+    `).join('');
+  document.getElementById('registres-body').innerHTML = rows ||
+    '<tr><td colspan="8"><div class="empty-state"><p>Cap registre disponible</p></div></td></tr>';
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function exportData() {
+  showToast('Preparant exportacio...', 'info');
+  apiFetch('/api/export').then(r => {
+    if (r.ok) {
+      window.open(r.url, '_blank');
+      showToast('Obrint el full de calcul.', 'success');
+    } else {
+      showToast('Error: ' + r.error, 'error');
+    }
+  }).catch(e => showToast(e.message, 'error'));
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  loadDashboard();
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-3').style.display = 'none';
+  
+  apiFetch('/api/users').then(r => { if (r.ok) allUsers = r.users || []; });
+});
+</script>
+</body>
+</html>
