@@ -11,11 +11,23 @@ const SPREADSHEET_ID = '13-HCGphpkB8zi4m6299YdMXEADWtXLc0Hy1CJot_Cj0';
 const PORT = 5000;
 
 function getAuth() {
+  let credentials;
   const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON;
-  if (!credentialsJson) {
-    throw new Error('GOOGLE_CREDENTIALS_JSON environment variable not set');
+  if (credentialsJson) {
+    try {
+      credentials = JSON.parse(credentialsJson);
+    } catch(e) {
+      // Env var may be corrupted, fall back to file
+    }
   }
-  const credentials = JSON.parse(credentialsJson);
+  if (!credentials) {
+    const credFile = path.join(__dirname, 'google-credentials.json');
+    if (fs.existsSync(credFile)) {
+      credentials = JSON.parse(fs.readFileSync(credFile, 'utf8'));
+    } else {
+      throw new Error('Google credentials not configured. Set GOOGLE_CREDENTIALS_JSON or provide google-credentials.json');
+    }
+  }
   const auth = new google.auth.GoogleAuth({
     credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
