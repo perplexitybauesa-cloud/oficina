@@ -652,6 +652,18 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, status: 'running' });
 });
 
+app.get('/download/Code.gs', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="Code.gs"');
+  res.sendFile(path.join(__dirname, 'Code.gs'));
+});
+
+app.get('/download/Index.html', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="Index.html"');
+  res.sendFile(path.join(__dirname, 'Index.html'));
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
