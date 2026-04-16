@@ -3,23 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Seguiment d'Usuaris</title>
+<title>Oficina Pobresa i Eficiencia Energetica - Sant Adria de Besos</title>
 <style>
-/* ── TOKENS ──────────────────────────────────────────── */
+/* ── TOKENS - Colores corporativos Ajuntament Sant Adria de Besos ── */
 :root,[data-theme="light"]{
-  --bg:#f7f6f2;--surface:#ffffff;--surface-2:#f3f0ec;--border:#dcd9d5;
-  --text:#28251d;--muted:#7a7974;--faint:#bab9b4;
-  --primary:#01696f;--primary-h:#0c4e54;--primary-hi:#cedcd8;
-  --success:#437a22;--error:#a12c7b;--warn:#964219;
-  --shadow:0 2px 8px rgba(0,0,0,.08);--shadow-lg:0 8px 28px rgba(0,0,0,.12);
+  --bg:#f8f7f5;--surface:#ffffff;--surface-2:#f5f3f0;--border:#e0dbd5;
+  --text:#2d2a26;--muted:#6b6660;--faint:#a8a29e;
+  --primary:#8B1C4A;--primary-h:#6d1539;--primary-hi:#f3e6ec;
+  --secondary:#c41e5c;--accent:#d4447a;
+  --success:#2e7d32;--error:#c62828;--warn:#ef6c00;
+  --shadow:0 2px 8px rgba(139,28,74,.08);--shadow-lg:0 8px 28px rgba(139,28,74,.12);
   --r:0.5rem;--r-lg:0.75rem;--r-full:9999px;
   --font:'Inter','Helvetica Neue',sans-serif;
   --tr:160ms cubic-bezier(.16,1,.3,1);
 }
 [data-theme="dark"]{
-  --bg:#171614;--surface:#1c1b19;--surface-2:#22211f;--border:#393836;
-  --text:#cdccca;--muted:#797876;--faint:#5a5957;
-  --primary:#4f98a3;--primary-h:#227f8b;--primary-hi:#313b3b;
+  --bg:#1a1816;--surface:#201e1c;--surface-2:#2a2724;--border:#3d3935;
+  --text:#e8e6e3;--muted:#9a958f;--faint:#6b6660;
+  --primary:#c95a8a;--primary-h:#a84872;--primary-hi:#3d2530;
+  --secondary:#d4447a;--accent:#e87aa4;
   --shadow:0 2px 8px rgba(0,0,0,.3);--shadow-lg:0 8px 28px rgba(0,0,0,.4);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -74,14 +76,14 @@ img{display:block;max-width:100%}
 .btn-icon:hover{background:var(--surface-2);color:var(--text)}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r-full);
        font-size:11px;font-weight:600;gap:4px}
-.badge-green{background:#d4dfcc;color:#2e5c10}
-.badge-blue{background:#c6d8e4;color:#0b5177}
-.badge-orange{background:#e7d7c4;color:#713417}
-.badge-purple{background:#dacfde;color:#5f2699}
-[data-theme="dark"] .badge-green{background:#3a4435;color:#6daa45}
-[data-theme="dark"] .badge-blue{background:#3a4550;color:#5591c7}
-[data-theme="dark"] .badge-orange{background:#564b3e;color:#fdab43}
-[data-theme="dark"] .badge-purple{background:#4e4652;color:#a86fdf}
+.badge-green{background:#d7e8d7;color:#2e7d32}
+.badge-blue{background:#e8d7e2;color:#8B1C4A}
+.badge-orange{background:#ffe8d6;color:#bf5700}
+.badge-purple{background:#f3e6ec;color:#c41e5c}
+[data-theme="dark"] .badge-green{background:#2a3d2a;color:#81c784}
+[data-theme="dark"] .badge-blue{background:#3d2530;color:#c95a8a}
+[data-theme="dark"] .badge-orange{background:#4a3520;color:#ffb74d}
+[data-theme="dark"] .badge-purple{background:#3d2530;color:#d4447a}
 
 /* ── VIEWS ───────────────────────────────────────────── */
 .view{display:none;animation:fadeIn .18s ease}
@@ -158,8 +160,8 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
 .user-found{background:var(--primary-hi);border:1px solid color-mix(in oklab,var(--primary) 30%,transparent);
             border-radius:var(--r-lg);padding:12px 16px;display:flex;align-items:center;
             gap:10px;font-size:13px;margin-bottom:18px;color:var(--primary)}
-.user-new{background:#d4dfcc;border:1px solid #437a22;color:#2e5c10}
-[data-theme="dark"] .user-new{background:#3a4435;border-color:#6daa45;color:#6daa45}
+.user-new{background:#d7e8d7;border:1px solid #2e7d32;color:#1b5e20}
+[data-theme="dark"] .user-new{background:#2a3d2a;border-color:#81c784;color:#81c784}
 .user-found svg{flex-shrink:0}
 
 /* Checkbox grid */
@@ -248,14 +250,16 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
 <aside id="sidebar">
   <div class="sidebar-logo">
     <div class="logo-mark">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      <!-- Icono casa con vela (representa el logo de la oficina) -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <path d="M12 10v6" stroke-linecap="round"/>
+        <ellipse cx="12" cy="9" rx="1" ry="1.5" fill="currentColor"/>
       </svg>
     </div>
     <div>
-      <div class="logo-text">Seguiment</div>
-      <div class="logo-sub">Penta Comunidad</div>
+      <div class="logo-text">Oficina Energia</div>
+      <div class="logo-sub">Sant Adria de Besos</div>
     </div>
   </div>
   <nav class="sidebar-nav">
@@ -399,7 +403,12 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
       <!-- STEP 2: User + attention data -->
       <div id="step-2" style="display:none">
         <div class="card">
-          <div class="form-section-title">👤 Dades personals</div>
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            Dades personals
+          </div>
           <div id="user-banner" class="user-found" style="display:none"></div>
           <div class="form-grid">
             <div class="field"><label>Nom i Cognoms <span class="req">*</span></label>
@@ -440,7 +449,14 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
           </div>
         </div>
         <div class="card">
-          <div class="form-section-title">📋 Dades de l'atenció</div>
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            Dades de l'atencio
+          </div>
           <div class="form-grid">
             <div class="field"><label>Derivació <span class="req">*</span></label>
               <select class="inp" id="f-derivacio">
@@ -488,9 +504,14 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
       <!-- STEP 3: Assessoraments -->
       <div id="step-3" style="display:none">
         <div class="card">
-          <div class="form-section-title">⚡ Assessoraments realitzats</div>
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
+            </svg>
+            Assessoraments realitzats
+          </div>
           <div class="check-grid">
-            <div class="check-group-title">💡 Llum / Electricitat</div>
+            <div class="check-group-title">Llum / Electricitat</div>
             <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat llum"> Canvi titularitat llum</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Canvi comercialitzadora llum"> Canvi comercialitzadora llum</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Mercat lliure a mercat regulat"> Mercat lliure → regulat</label>
@@ -504,7 +525,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
             <label class="check-item"><input type="checkbox" name="assess" value="Negociar deute llum"> Negociar deute llum</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Alta llum"> Alta llum</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Treva llum"> Treva llum</label>
-            <div class="check-group-title">🔥 Gas</div>
+            <div class="check-group-title">Gas</div>
             <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat gas"> Canvi titularitat gas</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Canvi comercialitzadora gas"> Canvi comercialitzadora gas</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Mercat lliure a TUR"> Mercat lliure → TUR</label>
@@ -514,7 +535,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
             <label class="check-item"><input type="checkbox" name="assess" value="Gestió de trams"> Gestió de trams</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Canon social"> Canon social</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Treva gas"> Treva gas</label>
-            <div class="check-group-title">💧 Aigua</div>
+            <div class="check-group-title">Aigua</div>
             <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat aigua"> Canvi titularitat aigua</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Ajuda MUSA (comptadors)"> Ajuda MUSA (comptadors)</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu aigua"> Tall efectiu aigua</label>
@@ -523,7 +544,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
             <label class="check-item"><input type="checkbox" name="assess" value="Negociar deute aigua"> Negociar deute aigua</label>
             <label class="check-item"><input type="checkbox" name="assess" value="IRER enviat"> IRER enviat</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Treva aigua"> Treva aigua</label>
-            <div class="check-group-title">📦 Altres</div>
+            <div class="check-group-title">Altres gestions</div>
             <label class="check-item"><input type="checkbox" name="assess" value="Projecte Porta a Porta"> Projecte Porta a Porta</label>
             <label class="check-item"><input type="checkbox" name="assess" value="ONA"> ONA</label>
           </div>
