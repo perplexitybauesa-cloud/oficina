@@ -352,6 +352,7 @@ function _guardarGestions(ss, assessos, dni, nom, enlace, idAtencio) {
     'Tall efectiu llum':              'TALL_EFECTIU_LLUM',
     'Bo tèrmic':                      'BO_TERMIC',
     'Punxada llum':                   'PUNXADA_LLUM',
+    'Desconnexió llum':               'DESCONNEXIÓ',
     'Negociar deute llum':            'NEGOCIAR_DEUTE_LLUM',
     'Alta llum':                      'ALTA_LLUM',
     'Treva llum':                     'TREVA_LLUM'
@@ -364,6 +365,7 @@ function _guardarGestions(ss, assessos, dni, nom, enlace, idAtencio) {
     'Eliminació serveis extres gas':  'ELIMINACIÓ_SERVEIS_EXTRES',
     'Tall efectiu gas':               'TALL_EFECTIU_GAS',
     'Punxada gas':                    'PUNXADA_GAS',
+    'Desconnexió gas':                'DESCONNEXIÓ',
     'Gestió de trams':                'GESTIÓ_TRAMS',
     'Canon social':                   'CANON_SOCIAL',
     'Treva gas':                      'TREVA_GAS'
@@ -374,6 +376,7 @@ function _guardarGestions(ss, assessos, dni, nom, enlace, idAtencio) {
     'Ajuda MUSA (comptadors)':        'AJUDA_MUSA',
     'Tall efectiu aigua':             'TALL_EFECTIU_AIGUA',
     'Punxada aigua':                  'PUNXADA_AIGUA',
+    'Desconnexió aigua':              'DESCONNEXIÓ',
     'Alta aigua':                     'ALTA_AIGUA',
     'Negociar deute aigua':           'NEGOCIAR_DEUTE',
     'IRER enviat':                    'IRER_ENVIAT',

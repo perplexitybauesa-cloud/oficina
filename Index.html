@@ -300,6 +300,22 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
       </svg>
       Mode fosc
     </button>
+    <div style="margin-top:12px;padding:10px;border-top:1px solid var(--border);text-align:center">
+      <div style="font-size:9px;color:var(--faint);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">
+        Un projecte de
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;opacity:0.7">
+        <svg width="70" height="24" viewBox="0 0 100 30" fill="none">
+          <rect x="0" y="0" width="100" height="30" rx="2" fill="var(--primary)"/>
+          <text x="50" y="18" font-size="8" fill="white" text-anchor="middle" font-weight="600">AJUNTAMENT</text>
+          <text x="50" y="26" font-size="6" fill="white" text-anchor="middle">Sant Adria de Besos</text>
+        </svg>
+        <svg width="36" height="24" viewBox="0 0 50 30" fill="none">
+          <rect x="0" y="0" width="50" height="30" rx="2" fill="#c41e5c"/>
+          <text x="25" y="18" font-size="10" fill="white" text-anchor="middle" font-weight="700">AMB</text>
+        </svg>
+      </div>
+    </div>
   </div>
 </aside>
 
@@ -473,7 +489,14 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
                 <option>Norfa</option><option>Esther</option><option>Altres</option>
               </select></div>
             <div class="field"><label>Referent</label>
-              <input class="inp" id="f-referent"></div>
+              <select class="inp" id="f-referent">
+                <option value="">Selecciona…</option>
+                <option>Serveis Socials</option>
+                <option>Entitat Social</option>
+                <option>Pla De Besos</option>
+                <option>No Derivat</option>
+                <option>Altres</option>
+              </select></div>
             <div class="field"><label>Cal assessorament?</label>
               <select class="inp" id="f-cal-ass">
                 <option value="">—</option>
@@ -522,6 +545,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
             <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu llum"> Tall efectiu llum</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Bo tèrmic"> Bo tèrmic</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Punxada llum"> Punxada llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Desconnexió llum"> Desconnexio llum</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Negociar deute llum"> Negociar deute llum</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Alta llum"> Alta llum</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Treva llum"> Treva llum</label>
@@ -532,7 +556,8 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
             <label class="check-item"><input type="checkbox" name="assess" value="Eliminació serveis extres gas"> Eliminació serveis extres</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu gas"> Tall efectiu gas</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Punxada gas"> Punxada gas</label>
-            <label class="check-item"><input type="checkbox" name="assess" value="Gestió de trams"> Gestió de trams</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Desconnexió gas"> Desconnexio gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Gestió de trams"> Gestio de trams</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Canon social"> Canon social</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Treva gas"> Treva gas</label>
             <div class="check-group-title">Aigua</div>
@@ -540,6 +565,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width
             <label class="check-item"><input type="checkbox" name="assess" value="Ajuda MUSA (comptadors)"> Ajuda MUSA (comptadors)</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu aigua"> Tall efectiu aigua</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Punxada aigua"> Punxada aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Desconnexió aigua"> Desconnexio aigua</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Alta aigua"> Alta aigua</label>
             <label class="check-item"><input type="checkbox" name="assess" value="Negociar deute aigua"> Negociar deute aigua</label>
             <label class="check-item"><input type="checkbox" name="assess" value="IRER enviat"> IRER enviat</label>
@@ -732,8 +758,16 @@ function renderBarChart(elId, data) {
 
 function badgeDerivacio(d) {
   const map = {
-    'Publicitat':'badge-blue','Serveis Socials':'badge-green',
-    'Entitats Socials':'badge-purple','CAP':'badge-orange'
+    'Publicitat':'badge-blue',
+    'Serveis Socials':'badge-green',
+    'Entitats Socials':'badge-purple',
+    'Entitat Social':'badge-purple',
+    'CAP':'badge-orange',
+    'Oficina Habitatge':'badge-orange',
+    'Pla De Besos':'badge-green',
+    'No Derivat':'badge-blue',
+    'Altres':'badge-blue',
+    'Tallers':'badge-purple'
   };
   const cls = map[d] || 'badge-blue';
   return `<span class="badge ${cls}">${d}</span>`;
