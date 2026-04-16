@@ -54,6 +54,16 @@ function nextId_(ws) {
   return Math.max(ws.getLastRow(), 1);
 }
 
+/**
+ * Formatea una fecha para mostrar
+ * @param {Date} date - Fecha a formatear
+ * @returns {string} Fecha formateada dd/MM/yyyy
+ */
+function formatDate_(date) {
+  if (!(date instanceof Date) || isNaN(date)) return '-';
+  return Utilities.formatDate(date, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+}
+
 // ─────────────────────────────────────────────────────────────
 //  1. DASHBOARD — Estadisticas generales
 //  Obtiene KPIs, graficos y ultimas atenciones para el panel principal
@@ -76,18 +86,31 @@ function getDashboardStats() {
     const quiRepIdx    = hA.indexOf('QUI_REP');
     const derivacioIdx = hA.indexOf('DERIVACIÓ');
     const dniIdxA      = hA.indexOf('DNI');
+    const calAssIdx    = hA.indexOf('CAL_ASSESSORAMENT');
 
-    // Calcular atenciones del mes actual
+    // Calcular atenciones del mes actual y mes anterior
     const ara = new Date();
     const mesActual = ara.getMonth();
     const anyActual = ara.getFullYear();
+    const mesAnterior = mesActual === 0 ? 11 : mesActual - 1;
+    const anyAnterior = mesActual === 0 ? anyActual - 1 : anyActual;
 
     const rows = atData.slice(1);
 
-    const atencionesMes = rows.filter(r => {
+    let atencionesMes = 0;
+    let atencionesMesAnterior = 0;
+    
+    rows.forEach(r => {
       const d = new Date(r[fechaIdx]);
-      return !isNaN(d) && d.getMonth() === mesActual && d.getFullYear() === anyActual;
-    }).length;
+      if (!isNaN(d)) {
+        if (d.getMonth() === mesActual && d.getFullYear() === anyActual) {
+          atencionesMes++;
+        }
+        if (d.getMonth() === mesAnterior && d.getFullYear() === anyAnterior) {
+          atencionesMesAnterior++;
+        }
+      }
+    });
 
     // Agrupar atenciones por tecnico y por derivacion
     const perTecnic = {};
@@ -98,6 +121,11 @@ function getDashboardStats() {
       perTecnic[t]    = (perTecnic[t]    || 0) + 1;
       perDerivacio[d] = (perDerivacio[d] || 0) + 1;
     });
+
+    // Contar gestions pendents (atenciones con CAL_ASSESSORAMENT = 'Pendent')
+    const pendingGestions = rows.filter(r => 
+      r[calAssIdx] === 'Pendent' || r[calAssIdx] === 'Si'
+    ).length;
 
     // Obtener datos de usuarios para enlazar nombres
     const uData  = wsU.getDataRange().getValues();
@@ -113,13 +141,23 @@ function getDashboardStats() {
         id:        r[0],
         dni:       r[dniIdxA] || '-',
         nom:       uRow ? uRow[nomIdxU] : '-',
-        fecha:     data_ instanceof Date ? Utilities.formatDate(data_, Session.getScriptTimeZone(), 'dd/MM/yyyy') : (data_ || '-'),
+        fecha:     formatDate_(data_),
         derivacio: r[derivacioIdx] || '-',
         quiRep:    r[quiRepIdx]    || '-'
       };
     });
 
-    return { ok: true, totalUsuaris, totalAtencions, atencionesMes, perTecnic, perDerivacio, ultimes };
+    return { 
+      ok: true, 
+      totalUsuaris, 
+      totalAtencions, 
+      atencionesMes,
+      atencionesMesAnterior,
+      pendingGestions,
+      perTecnic, 
+      perDerivacio, 
+      ultimes 
+    };
   } catch(e) {
     return { ok: false, error: e.toString() };
   }
@@ -146,7 +184,7 @@ function buscarUsuariPerDNI(dni) {
     const obj = {};
     uH.forEach((h, i) => {
       const v = uData[filaIdx][i];
-      obj[h] = v instanceof Date ? Utilities.formatDate(v, Session.getScriptTimeZone(), 'dd/MM/yyyy') : v;
+      obj[h] = v instanceof Date ? formatDate_(v) : v;
     });
 
     // Obtener historial de atenciones del usuario
@@ -157,41 +195,104 @@ function buscarUsuariPerDNI(dni) {
     const fechaIdx = aH.indexOf('FECHA');
     const derivIdx = aH.indexOf('DERIVACIÓ');
     const quiIdx   = aH.indexOf('QUI_REP');
+    const obsIdx   = aH.indexOf('OBSERVACIONS');
+
+    // Obtener assessoraments para mapear a las atenciones
+    const wsAs   = ss.getSheetByName('ASSESSORAMENTS');
+    const asData = wsAs.getDataRange().getValues();
+    const asH    = asData[0];
+    const dniIdxAs = asH.indexOf('DNI');
+    const idAtIdxAs = asH.indexOf('ID_ATENCIO');
+    const assessIdx = asH.indexOf('ASSESSORAMENT');
 
     const historial = aData.slice(1)
       .filter(r => r[dniIdxA] === dni)
       .map(r => {
+        const idAtencio = r[0];
         const d = r[fechaIdx];
+        // Obtener assessoraments de esta atencion
+        const assessoraments = asData.slice(1)
+          .filter(a => a[idAtIdxAs] === idAtencio)
+          .map(a => a[assessIdx]);
+        
         return {
-          id:        r[0],
-          fecha:     d instanceof Date ? Utilities.formatDate(d, Session.getScriptTimeZone(), 'dd/MM/yyyy') : (d || '-'),
+          id:        idAtencio,
+          fecha:     formatDate_(d),
           derivacio: r[derivIdx] || '-',
           quiRep:    r[quiIdx]   || '-',
-          observ:    r[aH.indexOf('OBSERVACIONS')] || '-'
+          observ:    r[obsIdx] || '-',
+          assessoraments: assessoraments
         };
       })
       .reverse()
-      .slice(0, 10);
+      .slice(0, 15);
 
-    // Obtener asesoramientos previos del usuario
-    const wsAs  = ss.getSheetByName('ASSESSORAMENTS');
-    const asData = wsAs.getDataRange().getValues();
-    const asH    = asData[0];
-    const dniIdxAs = asH.indexOf('DNI');
-    const assessIdx = asH.indexOf('ASSESSORAMENT');
-    const assessos  = asData.slice(1)
-      .filter(r => r[dniIdxAs] === dni)
-      .map(r => r[assessIdx])
-      .slice(-10);
+    // Obtener notas del usuario (si existe la hoja NOTES)
+    let notes = [];
+    try {
+      const wsN = ss.getSheetByName('NOTES');
+      if (wsN) {
+        const nData = wsN.getDataRange().getValues();
+        const nH = nData[0];
+        const dniIdxN = nH.indexOf('DNI');
+        const textIdx = nH.indexOf('TEXT');
+        const tipusIdx = nH.indexOf('TIPUS');
+        const fechaIdxN = nH.indexOf('FECHA');
+        const autorIdx = nH.indexOf('AUTOR');
+        
+        notes = nData.slice(1)
+          .filter(r => r[dniIdxN] === dni)
+          .map(r => ({
+            text: r[textIdx],
+            tipus: r[tipusIdx] || 'info',
+            fecha: formatDate_(r[fechaIdxN]),
+            autor: r[autorIdx] || '-'
+          }))
+          .reverse()
+          .slice(0, 5);
+      }
+    } catch(e) {
+      // Si no existe la hoja NOTES, continuar sin notas
+    }
 
-    return { trobat: true, usuari: obj, historial, totalAtencions: historial.length, assessos };
+    return { 
+      trobat: true, 
+      usuari: obj, 
+      historial, 
+      totalAtencions: historial.length,
+      notes
+    };
   } catch(e) {
     return { ok: false, error: e.toString() };
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-//  3. GUARDAR NUEVA ATENCION (Usuario + Atencion + Gestion)
+//  3. OBTENER TODOS LOS USUARIOS (para busqueda global)
+//  Devuelve una lista simplificada de todos los usuarios
+// ─────────────────────────────────────────────────────────────
+function getAllUsers() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const wsU = ss.getSheetByName('USUARIS');
+    const uData = wsU.getDataRange().getValues();
+    const uH = uData[0];
+    const dniIdx = uH.indexOf('DNI');
+    const nomIdx = uH.indexOf('NOM');
+    
+    const users = uData.slice(1).map(r => ({
+      DNI: r[dniIdx],
+      NOM: r[nomIdx]
+    }));
+    
+    return { ok: true, users };
+  } catch(e) {
+    return { ok: false, error: e.toString() };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  4. GUARDAR NUEVA ATENCION (Usuario + Atencion + Gestion)
 //  Guarda o actualiza datos del usuario, registra la atencion
 //  y los asesoramientos y gestiones asociadas
 // ─────────────────────────────────────────────────────────────
@@ -222,7 +323,12 @@ function guardarAtencio(fd) {
     // Guardar gestiones en las hojas correspondientes
     _guardarGestions(ss, fd.assessoraments || [], dni, nom, enlace, idAtencio);
 
-    return { ok: true, idAtencio, missatge: `Atenció #${idAtencio} registrada correctament` };
+    // Guardar nota interna si existe
+    if (fd.notaInterna && fd.notaInterna.trim()) {
+      _guardarNotaInterna(ss, dni, fd.notaInterna, fd.notaAlerta ? 'alert' : 'info', fd.quiRep);
+    }
+
+    return { ok: true, idAtencio, missatge: `Atencio #${idAtencio} registrada correctament` };
   } catch(e) {
     return { ok: false, error: e.toString() };
   }
@@ -234,8 +340,6 @@ function guardarAtencio(fd) {
 
 /**
  * Guarda o actualiza los datos de un usuario en la hoja USUARIS
- * Columnas: ID_USUARI | DNI | NOM | ENLACE | GENERE | LLOC DE NAIXEMENT |
- *           BARRI | TINENÇA | ADREÇA | TELF. 1 | E-MAIL | TOTAL PERSONES HABITATGE
  */
 function _guardarUsuari(ss, fd, dni, nom, enlace, uData, uH) {
   const ws   = ss.getSheetByName('USUARIS');
@@ -269,8 +373,6 @@ function _guardarUsuari(ss, fd, dni, nom, enlace, uData, uH) {
 
 /**
  * Guarda una nueva atencion en la hoja ATENCIONS
- * Columnas: ID_ATENCIO | DNI | NOM | ENLACE | FECHA | DERIVACIO | QUI_REP |
- *           OBSERVACIONS | REFERENT | CIRCUMSTANCIES_ESPECIALS | CAL_ASSESSORAMENT
  */
 function _guardarAtencio(ss, fd, dni, nom) {
   const ws      = ss.getSheetByName('ATENCIONS');
@@ -305,7 +407,6 @@ function _guardarAtencio(ss, fd, dni, nom) {
 
 /**
  * Guarda los asesoramientos realizados en la hoja ASSESSORAMENTS
- * Columnas: ID_ASSESSORAMENT | ID_ATENCIO | DNI | NOM | ENLACE | FECHA | ORDRE | ASSESSORAMENT
  */
 function _guardarAssessoraments(ss, assessos, dni, nom, enlace, idAtencio) {
   const ws      = ss.getSheetByName('ASSESSORAMENTS');
@@ -334,8 +435,6 @@ function _guardarAssessoraments(ss, assessos, dni, nom, enlace, idAtencio) {
 
 /**
  * Guarda las gestiones en las hojas correspondientes segun el tipo
- * Escribe en: GESTIONS_LLUM, GESTIONS_GAS, GESTIONS_AIGUA, ALTRES_GESTIONS
- * basandose en las cabeceras reales de cada hoja
  */
 function _guardarGestions(ss, assessos, dni, nom, enlace, idAtencio) {
   const now = new Date();
@@ -345,14 +444,14 @@ function _guardarGestions(ss, assessos, dni, nom, enlace, idAtencio) {
     'Canvi titularitat llum':         'CANVI_TITULARITAT',
     'Canvi comercialitzadora llum':   'CANVI_COMERCIALITZADORA',
     'Mercat lliure a mercat regulat': 'DATA_ML_MR',
-    'Potència reduïda':               'POTÈNCIA_REDUÏDA',
-    'Eliminació serveis extres llum': 'ELIMINACIÓ_SERVEIS_EXTRES',
+    'Potencia reduida':               'POTÈNCIA_REDUÏDA',
+    'Eliminacio serveis extres llum': 'ELIMINACIÓ_SERVEIS_EXTRES',
     'Bo social':                      'BO_SOCIAL_DATA',
     'Nou bo social':                  'NOU_BO_SOCIAL_DATA',
     'Tall efectiu llum':              'TALL_EFECTIU_LLUM',
-    'Bo tèrmic':                      'BO_TERMIC',
+    'Bo termic':                      'BO_TERMIC',
     'Punxada llum':                   'PUNXADA_LLUM',
-    'Desconnexió llum':               'DESCONNEXIÓ',
+    'Desconnexio llum':               'DESCONNEXIÓ',
     'Negociar deute llum':            'NEGOCIAR_DEUTE_LLUM',
     'Alta llum':                      'ALTA_LLUM',
     'Treva llum':                     'TREVA_LLUM'
@@ -362,11 +461,11 @@ function _guardarGestions(ss, assessos, dni, nom, enlace, idAtencio) {
     'Canvi titularitat gas':          'DATA_CANVI_TIT_GAS',
     'Canvi comercialitzadora gas':    'CANVI_COMERCIALITZADORA',
     'Mercat lliure a TUR':            'ML_A_TUR',
-    'Eliminació serveis extres gas':  'ELIMINACIÓ_SERVEIS_EXTRES',
+    'Eliminacio serveis extres gas':  'ELIMINACIÓ_SERVEIS_EXTRES',
     'Tall efectiu gas':               'TALL_EFECTIU_GAS',
     'Punxada gas':                    'PUNXADA_GAS',
-    'Desconnexió gas':                'DESCONNEXIÓ',
-    'Gestió de trams':                'GESTIÓ_TRAMS',
+    'Desconnexio gas':                'DESCONNEXIÓ',
+    'Gestio de trams':                'GESTIÓ_TRAMS',
     'Canon social':                   'CANON_SOCIAL',
     'Treva gas':                      'TREVA_GAS'
   };
@@ -376,7 +475,7 @@ function _guardarGestions(ss, assessos, dni, nom, enlace, idAtencio) {
     'Ajuda MUSA (comptadors)':        'AJUDA_MUSA',
     'Tall efectiu aigua':             'TALL_EFECTIU_AIGUA',
     'Punxada aigua':                  'PUNXADA_AIGUA',
-    'Desconnexió aigua':              'DESCONNEXIÓ',
+    'Desconnexio aigua':              'DESCONNEXIÓ',
     'Alta aigua':                     'ALTA_AIGUA',
     'Negociar deute aigua':           'NEGOCIAR_DEUTE',
     'IRER enviat':                    'IRER_ENVIAT',
@@ -420,20 +519,153 @@ function _guardarGestions(ss, assessos, dni, nom, enlace, idAtencio) {
   });
 }
 
+/**
+ * Guarda una nota interna en la hoja NOTES
+ */
+function _guardarNotaInterna(ss, dni, text, tipus, autor) {
+  let ws = ss.getSheetByName('NOTES');
+  
+  // Crear la hoja si no existe
+  if (!ws) {
+    ws = ss.insertSheet('NOTES');
+    ws.appendRow(['ID_NOTA', 'DNI', 'TEXT', 'TIPUS', 'FECHA', 'AUTOR']);
+  }
+  
+  const id = nextId_(ws);
+  ws.appendRow([id, dni, text, tipus, new Date(), autor || '']);
+}
+
 // ─────────────────────────────────────────────────────────────
-//  4. ULTIMAS ATENCIONES (para listado general)
+//  5. GUARDAR NOTA (desde modal)
+// ─────────────────────────────────────────────────────────────
+function guardarNota(data) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const dni = (data.dni || '').toUpperCase().trim();
+    
+    if (!dni || !data.text) {
+      return { ok: false, error: 'Falten dades' };
+    }
+    
+    _guardarNotaInterna(ss, dni, data.text, data.tipus || 'info', Session.getActiveUser().getEmail());
+    
+    return { ok: true };
+  } catch(e) {
+    return { ok: false, error: e.toString() };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  6. GESTIONS PENDENTS
+//  Obtiene las gestiones que requieren seguimiento
+// ─────────────────────────────────────────────────────────────
+function getGestionsPendents() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const wsA = ss.getSheetByName('ATENCIONS');
+    const wsU = ss.getSheetByName('USUARIS');
+    const wsAs = ss.getSheetByName('ASSESSORAMENTS');
+    
+    const aData = wsA.getDataRange().getValues();
+    const aH = aData[0];
+    const uData = wsU.getDataRange().getValues();
+    const uH = uData[0];
+    const asData = wsAs.getDataRange().getValues();
+    const asH = asData[0];
+    
+    const dniIdxU = uH.indexOf('DNI');
+    const nomIdxU = uH.indexOf('NOM');
+    const fechaIdx = aH.indexOf('FECHA');
+    const dniIdxA = aH.indexOf('DNI');
+    const quiIdx = aH.indexOf('QUI_REP');
+    const calAssIdx = aH.indexOf('CAL_ASSESSORAMENT');
+    const idAtIdxAs = asH.indexOf('ID_ATENCIO');
+    const assessIdx = asH.indexOf('ASSESSORAMENT');
+    
+    // Filtrar atenciones pendientes
+    const pendientes = aData.slice(1)
+      .filter(r => r[calAssIdx] === 'Pendent' || r[calAssIdx] === 'Si')
+      .slice(-50)
+      .reverse();
+    
+    const rows = pendientes.map(r => {
+      const idAtencio = r[0];
+      const dni = r[dniIdxA];
+      const uRow = uData.find((u, i) => i > 0 && u[dniIdxU] === dni);
+      
+      // Obtener assessoraments de esta atencion
+      const assessoraments = asData.slice(1)
+        .filter(a => a[idAtIdxAs] === idAtencio)
+        .map(a => a[assessIdx]);
+      
+      // Determinar tipo de gestion basado en assessoraments
+      let tipus = 'altres';
+      if (assessoraments.some(a => a && a.toLowerCase().includes('llum'))) tipus = 'llum';
+      else if (assessoraments.some(a => a && a.toLowerCase().includes('gas'))) tipus = 'gas';
+      else if (assessoraments.some(a => a && a.toLowerCase().includes('aigua'))) tipus = 'aigua';
+      
+      return {
+        id: idAtencio,
+        dni: dni || '-',
+        nom: uRow ? uRow[nomIdxU] : '-',
+        fecha: formatDate_(r[fechaIdx]),
+        tecnic: r[quiIdx] || '-',
+        gestio: assessoraments.slice(0, 3).join(', ') || 'Sense especificar',
+        estat: r[calAssIdx] === 'Pendent' ? 'pendent' : 'en-curs',
+        tipus: tipus
+      };
+    });
+    
+    return { ok: true, rows };
+  } catch(e) {
+    return { ok: false, error: e.toString() };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  7. ACTUALIZAR ESTADO DE GESTION
+// ─────────────────────────────────────────────────────────────
+function updateGestioEstat(idAtencio, estat) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ws = ss.getSheetByName('ATENCIONS');
+    const data = ws.getDataRange().getValues();
+    const headers = data[0];
+    const calAssIdx = headers.indexOf('CAL_ASSESSORAMENT');
+    
+    // Buscar la fila
+    const filaIdx = data.findIndex((r, i) => i > 0 && r[0] == idAtencio);
+    if (filaIdx === -1) {
+      return { ok: false, error: 'Atencio no trobada' };
+    }
+    
+    // Actualizar el estado
+    const newValue = estat === 'completat' ? 'No' : (estat === 'en-curs' ? 'Si' : 'Pendent');
+    ws.getRange(filaIdx + 1, calAssIdx + 1).setValue(newValue);
+    
+    return { ok: true };
+  } catch(e) {
+    return { ok: false, error: e.toString() };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  8. ULTIMAS ATENCIONES (para listado general)
 //  Obtiene las ultimas N atenciones para mostrar en el listado
 // ─────────────────────────────────────────────────────────────
-function getUltimesAtencions(limit) {
+function getUltimesAtencions(limit, dateFrom, dateTo) {
   try {
     const ss   = SpreadsheetApp.openById(SPREADSHEET_ID);
     const wsA  = ss.getSheetByName('ATENCIONS');
     const wsU  = ss.getSheetByName('USUARIS');
+    const wsAs = ss.getSheetByName('ASSESSORAMENTS');
 
     const aData = wsA.getDataRange().getValues();
     const aH    = aData[0];
     const uData = wsU.getDataRange().getValues();
     const uH    = uData[0];
+    const asData = wsAs.getDataRange().getValues();
+    const asH    = asData[0];
     
     // Indices de columnas
     const dniIdxU = uH.indexOf('DNI');
@@ -443,23 +675,68 @@ function getUltimesAtencions(limit) {
     const derivIdx = aH.indexOf('DERIVACIÓ');
     const quiIdx   = aH.indexOf('QUI_REP');
     const calIdx   = aH.indexOf('CAL_ASSESSORAMENT');
+    const idAtIdxAs = asH.indexOf('ID_ATENCIO');
+    const assessIdx = asH.indexOf('ASSESSORAMENT');
+
+    // Filtrar por fecha si se proporcionan
+    let filteredData = aData.slice(1);
+    if (dateFrom) {
+      const fromDate = new Date(dateFrom);
+      filteredData = filteredData.filter(r => {
+        const d = new Date(r[fechaIdx]);
+        return !isNaN(d) && d >= fromDate;
+      });
+    }
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59);
+      filteredData = filteredData.filter(r => {
+        const d = new Date(r[fechaIdx]);
+        return !isNaN(d) && d <= toDate;
+      });
+    }
 
     // Obtener las ultimas N atenciones con datos del usuario
-    const rows = aData.slice(1).slice(-(limit || 30)).reverse().map(r => {
+    const rows = filteredData.slice(-(limit || 30)).reverse().map(r => {
+      const idAtencio = r[0];
       const uRow = uData.find((u, i) => i > 0 && u[dniIdxU] === r[dniIdxA]);
       const d = r[fechaIdx];
+      
+      // Obtener assessoraments de esta atencion
+      const assessoraments = asData.slice(1)
+        .filter(a => a[idAtIdxAs] === idAtencio)
+        .map(a => a[assessIdx]);
+      
       return {
-        id:        r[0],
+        id:        idAtencio,
         dni:       r[dniIdxA] || '-',
         nom:       uRow ? uRow[nomIdxU] : (r[aH.indexOf('NOM')] || '-'),
-        fecha:     d instanceof Date ? Utilities.formatDate(d, Session.getScriptTimeZone(), 'dd/MM/yyyy') : (d || '-'),
+        fecha:     formatDate_(d),
         derivacio: r[derivIdx] || '-',
         quiRep:    r[quiIdx]   || '-',
-        calAss:    r[calIdx]   || '-'
+        calAss:    r[calIdx]   || '-',
+        assessoraments: assessoraments
       };
     });
 
     return { ok: true, rows };
+  } catch(e) {
+    return { ok: false, error: e.toString() };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  9. EXPORTAR DATOS
+//  Crea una copia de los datos para exportar
+// ─────────────────────────────────────────────────────────────
+function exportarDades() {
+  try {
+    // En una implementacion real, esto podria crear un CSV o PDF
+    // Por ahora, simplemente confirmamos que se puede acceder a los datos
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const url = ss.getUrl();
+    
+    return { ok: true, url: url };
   } catch(e) {
     return { ok: false, error: e.toString() };
   }
