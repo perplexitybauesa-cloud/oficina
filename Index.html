@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="ca" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seguiment d'Usuaris</title>
+<style>
+/* ── TOKENS ──────────────────────────────────────────── */
+:root,[data-theme="light"]{
+  --bg:#f7f6f2;--surface:#ffffff;--surface-2:#f3f0ec;--border:#dcd9d5;
+  --text:#28251d;--muted:#7a7974;--faint:#bab9b4;
+  --primary:#01696f;--primary-h:#0c4e54;--primary-hi:#cedcd8;
+  --success:#437a22;--error:#a12c7b;--warn:#964219;
+  --shadow:0 2px 8px rgba(0,0,0,.08);--shadow-lg:0 8px 28px rgba(0,0,0,.12);
+  --r:0.5rem;--r-lg:0.75rem;--r-full:9999px;
+  --font:'Inter','Helvetica Neue',sans-serif;
+  --tr:160ms cubic-bezier(.16,1,.3,1);
+}
+[data-theme="dark"]{
+  --bg:#171614;--surface:#1c1b19;--surface-2:#22211f;--border:#393836;
+  --text:#cdccca;--muted:#797876;--faint:#5a5957;
+  --primary:#4f98a3;--primary-h:#227f8b;--primary-hi:#313b3b;
+  --shadow:0 2px 8px rgba(0,0,0,.3);--shadow-lg:0 8px 28px rgba(0,0,0,.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text);
+     display:flex;height:100dvh;overflow:hidden}
+a,button,[role="button"]{transition:background var(--tr),color var(--tr),border-color var(--tr),box-shadow var(--tr)}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+input,select,textarea{font:inherit;color:inherit}
+img{display:block;max-width:100%}
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+#sidebar{
+  width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:0;overflow:hidden;transition:width var(--tr);
+}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{
+  height:52px;min-height:52px;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;padding:0 20px;
+}
+#content{flex:1;overflow-y:auto;padding:24px}
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.sidebar-logo{
+  padding:18px 20px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.logo-mark{width:30px;height:30px;background:var(--primary);border-radius:var(--r);
+           display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{color:#fff}
+.logo-text{font-size:13px;font-weight:700;letter-spacing:-.2px;line-height:1.2}
+.logo-sub{font-size:11px;color:var(--muted);font-weight:400}
+.sidebar-nav{padding:10px 10px;flex:1;overflow-y:auto}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--faint);
+           text-transform:uppercase;padding:6px 10px 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);
+  cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);
+  margin-bottom:1px;user-select:none;
+}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item.active{background:var(--primary-hi);color:var(--primary);font-weight:600}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.sidebar-footer{padding:12px 10px;border-top:1px solid var(--border)}
+
+/* ── TOPBAR ──────────────────────────────────────────── */
+#page-title{font-size:14px;font-weight:600;flex:1}
+.btn-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+          border-radius:var(--r);color:var(--muted)}
+.btn-icon:hover{background:var(--surface-2);color:var(--text)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r-full);
+       font-size:11px;font-weight:600;gap:4px}
+.badge-green{background:#d4dfcc;color:#2e5c10}
+.badge-blue{background:#c6d8e4;color:#0b5177}
+.badge-orange{background:#e7d7c4;color:#713417}
+.badge-purple{background:#dacfde;color:#5f2699}
+[data-theme="dark"] .badge-green{background:#3a4435;color:#6daa45}
+[data-theme="dark"] .badge-blue{background:#3a4550;color:#5591c7}
+[data-theme="dark"] .badge-orange{background:#564b3e;color:#fdab43}
+[data-theme="dark"] .badge-purple{background:#4e4652;color:#a86fdf}
+
+/* ── VIEWS ───────────────────────────────────────────── */
+.view{display:none;animation:fadeIn .18s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── CARDS / KPIs ────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+          padding:16px;box-shadow:var(--shadow)}
+.kpi-label{font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--muted);
+           text-transform:uppercase;margin-bottom:6px}
+.kpi-value{font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--text);line-height:1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.kpi-card.accent{background:var(--primary);border-color:var(--primary)}
+.kpi-card.accent .kpi-label,.kpi-card.accent .kpi-sub{color:rgba(255,255,255,.7)}
+.kpi-card.accent .kpi-value{color:#fff}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+      padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-title{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;
+            gap:6px;color:var(--text)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+
+/* ── TABLE ───────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--surface-2);font-weight:600;font-size:11px;letter-spacing:.04em;
+         text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;
+         white-space:nowrap}
+tbody tr{border-top:1px solid var(--border);cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+tbody td{padding:10px 12px;vertical-align:middle;color:var(--text)}
+.td-muted{color:var(--muted);font-size:12px}
+.td-mono{font-family:monospace;font-size:12px;color:var(--muted)}
+
+/* ── CHART BARS ──────────────────────────────────────── */
+.bar-list{display:flex;flex-direction:column;gap:8px}
+.bar-item{display:flex;flex-direction:column;gap:3px}
+.bar-label{display:flex;justify-content:space-between;font-size:12px}
+.bar-label span:last-child{font-weight:600;color:var(--primary)}
+.bar-track{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;background:var(--primary);border-radius:3px;
+          transition:width .5s cubic-bezier(.16,1,.3,1)}
+
+/* ── FORM ────────────────────────────────────────────── */
+.form-section{margin-bottom:24px}
+.form-section-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+                    color:var(--muted);margin-bottom:12px;padding-bottom:8px;
+                    border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.form-grid.full{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:4px}
+label{font-size:12px;font-weight:600;color:var(--muted)}
+label .req{color:var(--error)}
+.inp{
+  height:36px;padding:0 10px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);font-size:13px;color:var(--text);width:100%;
+  transition:border-color var(--tr),box-shadow var(--tr);
+}
+textarea.inp{height:auto;padding:8px 10px;resize:vertical;min-height:70px}
+.inp:focus{outline:none;border-color:var(--primary);
+           box-shadow:0 0 0 3px color-mix(in oklab,var(--primary) 15%,transparent)}
+.inp::placeholder{color:var(--faint)}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7974' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+
+/* DNI search box */
+.dni-search-wrap{display:flex;gap:8px;margin-bottom:16px}
+.dni-search-wrap .inp{flex:1;font-size:14px;font-weight:500;text-transform:uppercase;height:42px}
+
+/* User found banner */
+.user-found{background:var(--primary-hi);border:1px solid color-mix(in oklab,var(--primary) 30%,transparent);
+            border-radius:var(--r-lg);padding:12px 16px;display:flex;align-items:center;
+            gap:10px;font-size:13px;margin-bottom:18px;color:var(--primary)}
+.user-new{background:#d4dfcc;border:1px solid #437a22;color:#2e5c10}
+[data-theme="dark"] .user-new{background:#3a4435;border-color:#6daa45;color:#6daa45}
+.user-found svg{flex-shrink:0}
+
+/* Checkbox grid */
+.check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px}
+.check-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--r);
+            cursor:pointer;font-size:13px;border:1px solid transparent}
+.check-item:hover{background:var(--surface-2);border-color:var(--border)}
+.check-item input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
+.check-group-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+                   color:var(--muted);margin:12px 0 6px;grid-column:1/-1}
+
+/* Steps */
+.steps{display:flex;gap:6px;margin-bottom:24px;align-items:center}
+.step{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);
+      display:flex;align-items:center;justify-content:center;font-size:12px;
+      font-weight:700;color:var(--muted)}
+.step.done{background:var(--primary);border-color:var(--primary);color:#fff}
+.step.active{border-color:var(--primary);color:var(--primary)}
+.step-line{flex:1;height:2px;background:var(--border);border-radius:1px}
+.step-line.done{background:var(--primary)}
+
+/* Buttons */
+.btn{height:36px;padding:0 16px;border-radius:var(--r);font-size:13px;font-weight:600;
+     display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-h)}
+.btn-secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+.btn-lg{height:42px;padding:0 20px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+
+/* Search result card */
+.user-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+           overflow:hidden;box-shadow:var(--shadow)}
+.user-card-header{background:var(--primary);padding:16px 20px;color:#fff}
+.user-card-header h2{font-size:16px;font-weight:700;margin-bottom:4px}
+.user-card-header .sub{font-size:12px;opacity:.8}
+.user-card-body{padding:20px}
+.user-info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.info-item{display:flex;flex-direction:column;gap:2px}
+.info-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.info-value{font-size:13px;font-weight:500;color:var(--text)}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:20px;right:20px;z-index:1000;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:12px 16px;box-shadow:var(--shadow-lg);max-width:320px;font-size:13px;
+  display:flex;align-items:center;gap:10px;
+  transform:translateY(80px);opacity:0;transition:all .25s cubic-bezier(.16,1,.3,1);
+}
+#toast.show{transform:none;opacity:1}
+#toast.success{border-left:3px solid var(--success)}
+#toast.error{border-left:3px solid var(--error)}
+
+/* Loading */
+.spinner{width:20px;height:20px;border:2px solid var(--border);
+         border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{display:flex;align-items:center;justify-content:center;gap:10px;
+             padding:32px;color:var(--muted);font-size:13px}
+
+/* Empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;
+             padding:40px 20px;color:var(--muted)}
+.empty-state svg{margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:13px;max-width:28ch}
+
+/* Mobile sidebar toggle */
+#menu-btn{display:none}
+@media(max-width:680px){
+  #sidebar{position:fixed;top:0;left:0;height:100%;z-index:100;
+           transform:translateX(-100%);transition:transform var(--tr)}
+  #sidebar.open{transform:none;box-shadow:var(--shadow-lg)}
+  #menu-btn{display:flex}
+  #content{padding:16px}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Seguiment</div>
+      <div class="logo-sub">Penta Comunidad</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Principal</div>
+    <div class="nav-item active" data-view="dashboard">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      Dashboard
+    </div>
+    <div class="nav-item" data-view="nova-atencio">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      Nova Atenció
+    </div>
+    <div class="nav-item" data-view="cerca">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      Cerca Usuari
+    </div>
+    <div class="nav-item" data-view="registres">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/>
+      </svg>
+      Últims Registres
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="nav-item" style="width:100%" onclick="toggleTheme()">
+      <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+      Mode fosc
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <header id="topbar">
+    <button id="menu-btn" class="btn-icon" onclick="toggleSidebar()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <span id="page-title">Dashboard</span>
+    <span style="flex:1"></span>
+    <button class="btn btn-primary" onclick="navigate('nova-atencio')" style="height:30px;font-size:12px">
+      + Nova Atenció
+    </button>
+  </header>
+
+  <div id="content">
+
+    <!-- ── DASHBOARD ──────────────────────────────── -->
+    <div class="view active" id="view-dashboard">
+      <div id="kpi-area">
+        <div class="loading-row"><div class="spinner"></div> Carregant estadístiques…</div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            </svg>
+            Atencions per tècnic
+          </div>
+          <div id="chart-tecnic"><div class="loading-row"><div class="spinner"></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+            </svg>
+            Atencions per derivació
+          </div>
+          <div id="chart-derivacio"><div class="loading-row"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Últimes atencions
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>Data</th><th>Nom</th><th>DNI</th><th>Derivació</th><th>Tècnic</th>
+            </tr></thead>
+            <tbody id="dash-table-body">
+              <tr><td colspan="5"><div class="loading-row"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NOVA ATENCIÓ ───────────────────────────── -->
+    <div class="view" id="view-nova-atencio">
+      <!-- Step indicator -->
+      <div class="steps">
+        <div class="step active" id="step1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step" id="step2">2</div>
+        <div class="step-line" id="line2"></div>
+        <div class="step" id="step3">3</div>
+        <span style="margin-left:8px;font-size:12px;color:var(--muted)" id="step-label">Identificació</span>
+      </div>
+
+      <!-- STEP 1: DNI lookup -->
+      <div id="step-1" class="card">
+        <div class="form-section-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Verificació DNI / NIE
+        </div>
+        <div class="dni-search-wrap">
+          <input class="inp" id="input-dni" placeholder="12345678A" maxlength="12"
+                 oninput="this.value=this.value.toUpperCase()"
+                 onkeydown="if(event.key==='Enter')lookupDNI()">
+          <button class="btn btn-primary btn-lg" onclick="lookupDNI()" id="btn-lookup">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Verificar
+          </button>
+        </div>
+        <div id="lookup-result" style="display:none"></div>
+      </div>
+
+      <!-- STEP 2: User + attention data -->
+      <div id="step-2" style="display:none">
+        <div class="card">
+          <div class="form-section-title">👤 Dades personals</div>
+          <div id="user-banner" class="user-found" style="display:none"></div>
+          <div class="form-grid">
+            <div class="field"><label>Nom i Cognoms <span class="req">*</span></label>
+              <input class="inp" id="f-nom" required></div>
+            <div class="field"><label>Gènere <span class="req">*</span></label>
+              <select class="inp" id="f-genere">
+                <option value="">Selecciona…</option>
+                <option>D</option><option>H</option><option>D / H</option>
+                <option>No especificat</option>
+              </select></div>
+            <div class="field"><label>Lloc de Naixement</label>
+              <select class="inp" id="f-lloc">
+                <option value="">Selecciona…</option>
+                <option>Catalunya</option><option>Resta d'Espanya</option>
+                <option>Europa</option><option>Àfrica</option>
+                <option>Amèrica Llatina</option><option>Àsia</option><option>Altres</option>
+              </select></div>
+            <div class="field"><label>Persones habitatge</label>
+              <input class="inp" id="f-persones" type="number" min="1" max="20"></div>
+            <div class="field"><label>Barri <span class="req">*</span></label>
+              <select class="inp" id="f-barri">
+                <option value="">Selecciona…</option>
+                <option>Mina</option><option>Sant Joan Batista</option>
+                <option>Besòs</option><option>Sant Adrià Nord</option>
+                <option>Trajana</option><option>La Catalana</option><option>Altres</option>
+              </select></div>
+            <div class="field"><label>Tinença <span class="req">*</span></label>
+              <select class="inp" id="f-tinenca">
+                <option value="">Selecciona…</option>
+                <option>Propietat</option><option>Lloguer</option><option>Altres</option>
+              </select></div>
+            <div class="field"><label>Adreça</label>
+              <input class="inp" id="f-adreca"></div>
+            <div class="field"><label>Telèfon</label>
+              <input class="inp" id="f-telf" type="tel"></div>
+            <div class="field"><label>Email</label>
+              <input class="inp" id="f-email" type="email"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="form-section-title">📋 Dades de l'atenció</div>
+          <div class="form-grid">
+            <div class="field"><label>Derivació <span class="req">*</span></label>
+              <select class="inp" id="f-derivacio">
+                <option value="">Selecciona…</option>
+                <option>Publicitat</option><option>Serveis Socials</option>
+                <option>Entitats Socials</option><option>Altres</option>
+                <option>Tallers</option><option>CAP</option>
+                <option>Oficina Habitatge</option>
+              </select></div>
+            <div class="field"><label>Qui rep? <span class="req">*</span></label>
+              <select class="inp" id="f-qui-rep">
+                <option value="">Selecciona…</option>
+                <option>Marta</option><option>Karina</option><option>Ricard</option>
+                <option>Norfa</option><option>Esther</option><option>Altres</option>
+              </select></div>
+            <div class="field"><label>Referent</label>
+              <input class="inp" id="f-referent"></div>
+            <div class="field"><label>Cal assessorament?</label>
+              <select class="inp" id="f-cal-ass">
+                <option value="">—</option>
+                <option>Sí</option><option>No</option><option>Pendent</option>
+              </select></div>
+          </div>
+          <div style="margin-top:12px" class="field">
+            <label>Circumstàncies especials</label>
+            <div class="check-grid" style="margin-top:6px">
+              <label class="check-item"><input type="checkbox" name="circ" value="Vulnerabilitat energètica"> Vulnerabilitat energètica</label>
+              <label class="check-item"><input type="checkbox" name="circ" value="Risc d'exclusió social"> Risc d'exclusió social</label>
+              <label class="check-item"><input type="checkbox" name="circ" value="Família monoparental"> Família monoparental</label>
+              <label class="check-item"><input type="checkbox" name="circ" value="Persona gran"> Persona gran</label>
+              <label class="check-item"><input type="checkbox" name="circ" value="Discapacitat"> Discapacitat</label>
+            </div>
+          </div>
+          <div style="margin-top:12px" class="field">
+            <label>Observacions rellevants</label>
+            <textarea class="inp" id="f-obs" rows="3" placeholder="Informació addicional…"></textarea>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goStep(1)">← Tornar</button>
+          <button class="btn btn-primary" onclick="goStep(3)">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Assessoraments -->
+      <div id="step-3" style="display:none">
+        <div class="card">
+          <div class="form-section-title">⚡ Assessoraments realitzats</div>
+          <div class="check-grid">
+            <div class="check-group-title">💡 Llum / Electricitat</div>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat llum"> Canvi titularitat llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi comercialitzadora llum"> Canvi comercialitzadora llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Mercat lliure a mercat regulat"> Mercat lliure → regulat</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Potència reduïda"> Potència reduïda</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Eliminació serveis extres llum"> Eliminació serveis extres</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Bo social"> Bo social</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Nou bo social"> Nou bo social</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu llum"> Tall efectiu llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Bo tèrmic"> Bo tèrmic</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Punxada llum"> Punxada llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Negociar deute llum"> Negociar deute llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Alta llum"> Alta llum</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Treva llum"> Treva llum</label>
+            <div class="check-group-title">🔥 Gas</div>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat gas"> Canvi titularitat gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi comercialitzadora gas"> Canvi comercialitzadora gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Mercat lliure a TUR"> Mercat lliure → TUR</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Eliminació serveis extres gas"> Eliminació serveis extres</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu gas"> Tall efectiu gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Punxada gas"> Punxada gas</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Gestió de trams"> Gestió de trams</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canon social"> Canon social</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Treva gas"> Treva gas</label>
+            <div class="check-group-title">💧 Aigua</div>
+            <label class="check-item"><input type="checkbox" name="assess" value="Canvi titularitat aigua"> Canvi titularitat aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Ajuda MUSA (comptadors)"> Ajuda MUSA (comptadors)</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Tall efectiu aigua"> Tall efectiu aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Punxada aigua"> Punxada aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Alta aigua"> Alta aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Negociar deute aigua"> Negociar deute aigua</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="IRER enviat"> IRER enviat</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="Treva aigua"> Treva aigua</label>
+            <div class="check-group-title">📦 Altres</div>
+            <label class="check-item"><input type="checkbox" name="assess" value="Projecte Porta a Porta"> Projecte Porta a Porta</label>
+            <label class="check-item"><input type="checkbox" name="assess" value="ONA"> ONA</label>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goStep(2)">← Tornar</button>
+          <button class="btn btn-primary btn-lg" id="btn-submit" onclick="submitForm()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+            Guardar atenció
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CERCA USUARI ───────────────────────────── -->
+    <div class="view" id="view-cerca">
+      <div class="card">
+        <div class="form-section-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Cerca per DNI / NIE
+        </div>
+        <div class="dni-search-wrap">
+          <input class="inp" id="search-dni" placeholder="12345678A" maxlength="12"
+                 oninput="this.value=this.value.toUpperCase()"
+                 onkeydown="if(event.key==='Enter')searchUser()">
+          <button class="btn btn-primary btn-lg" onclick="searchUser()">Cercar</button>
+        </div>
+      </div>
+      <div id="search-result"></div>
+    </div>
+
+    <!-- ── ÚLTIMS REGISTRES ───────────────────────── -->
+    <div class="view" id="view-registres">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div class="card-title" style="margin:0">Últimes 30 atencions</div>
+          <button class="btn btn-secondary" style="height:28px;font-size:12px" onclick="loadRegistres()">
+            ↻ Actualitzar
+          </button>
+        </div>
+        <div class="tbl-wrap" style="border:none;border-radius:0">
+          <table>
+            <thead><tr>
+              <th>#</th><th>Data</th><th>Nom</th><th>DNI</th>
+              <th>Derivació</th><th>Tècnic</th><th>Assessorament?</th>
+            </tr></thead>
+            <tbody id="registres-body">
+              <tr><td colspan="7"><div class="loading-row"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────
+let currentStep = 1;
+let currentDNI  = '';
+let isDarkMode  = false;
+let statsLoaded = false;
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function navigate(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelector(`[data-view="${view}"]`).classList.add('active');
+
+  const titles = {
+    'dashboard':   'Dashboard',
+    'nova-atencio':'Nova Atenció',
+    'cerca':       'Cerca Usuari',
+    'registres':   'Últims Registres'
+  };
+  document.getElementById('page-title').textContent = titles[view] || view;
+
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+
+  if (view === 'dashboard' && !statsLoaded) loadDashboard();
+  if (view === 'registres') loadRegistres();
+}
+
+document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+  el.addEventListener('click', () => navigate(el.dataset.view));
+});
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── THEME ─────────────────────────────────────────────────────
+function toggleTheme() {
+  isDarkMode = !isDarkMode;
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  document.querySelector('.nav-item[onclick="toggleTheme()"]').querySelector('svg').innerHTML =
+    isDarkMode
+      ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+      : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + (type || '');
+  setTimeout(() => { t.className = ''; }, 3500);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function loadDashboard() {
+  google.script.run
+    .withSuccessHandler(renderDashboard)
+    .withFailureHandler(e => showToast('Error: ' + e.message, 'error'))
+    .getDashboardStats();
+}
+
+function renderDashboard(d) {
+  if (!d.ok) { showToast('Error: ' + d.error, 'error'); return; }
+  statsLoaded = true;
+
+  // KPIs
+  document.getElementById('kpi-area').innerHTML = `
+    <div class="kpi-grid">
+      <div class="kpi-card accent">
+        <div class="kpi-label">Total usuaris</div>
+        <div class="kpi-value">${d.totalUsuaris}</div>
+        <div class="kpi-sub">usuaris únics (DNI)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total atencions</div>
+        <div class="kpi-value">${d.totalAtencions}</div>
+        <div class="kpi-sub">des de l'inici</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Aquest mes</div>
+        <div class="kpi-value">${d.atencionesMes}</div>
+        <div class="kpi-sub">atencions al mes actual</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tècnics actius</div>
+        <div class="kpi-value">${Object.keys(d.perTecnic).length}</div>
+        <div class="kpi-sub">professionals</div>
+      </div>
+    </div>`;
+
+  // Chart tècnics
+  renderBarChart('chart-tecnic', d.perTecnic);
+  // Chart derivació
+  renderBarChart('chart-derivacio', d.perDerivacio);
+
+  // Table
+  const rows = d.ultimes.map(r => `
+    <tr onclick="openUser('${r.dni}')">
+      <td>${r.fecha}</td>
+      <td><strong>${r.nom}</strong></td>
+      <td class="td-mono">${r.dni}</td>
+      <td>${badgeDerivacio(r.derivacio)}</td>
+      <td class="td-muted">${r.quiRep}</td>
+    </tr>`).join('');
+  document.getElementById('dash-table-body').innerHTML = rows ||
+    '<tr><td colspan="5"><div class="empty-state"><p>Cap atenció registrada</p></div></td></tr>';
+}
+
+function renderBarChart(elId, data) {
+  const total = Object.values(data).reduce((a,b)=>a+b,0);
+  const sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const html = '<div class="bar-list">' + sorted.map(([label, val]) => `
+    <div class="bar-item">
+      <div class="bar-label"><span>${label}</span><span>${val}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(val/total*100)}%"></div></div>
+    </div>`).join('') + '</div>';
+  document.getElementById(elId).innerHTML = html;
+}
+
+function badgeDerivacio(d) {
+  const map = {
+    'Publicitat':'badge-blue','Serveis Socials':'badge-green',
+    'Entitats Socials':'badge-purple','CAP':'badge-orange'
+  };
+  const cls = map[d] || 'badge-blue';
+  return `<span class="badge ${cls}">${d}</span>`;
+}
+
+// ── DNI LOOKUP (Nova Atenció) ─────────────────────────────────
+function lookupDNI() {
+  const dni = document.getElementById('input-dni').value.trim();
+  if (dni.length < 8) { showToast('Introdueix un DNI/NIE vàlid', 'error'); return; }
+  currentDNI = dni.toUpperCase();
+
+  const btn = document.getElementById('btn-lookup');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+
+  google.script.run
+    .withSuccessHandler(r => { btn.disabled=false; btn.innerHTML='Verificar'; handleLookup(r); })
+    .withFailureHandler(e => { btn.disabled=false; btn.innerHTML='Verificar'; showToast(e.message,'error'); })
+    .buscarUsuariPerDNI(currentDNI);
+}
+
+function handleLookup(r) {
+  const el = document.getElementById('lookup-result');
+  el.style.display = 'block';
+
+  // Error del servidor (excepció en buscarUsuariPerDNI)
+  if (r.ok === false) {
+    el.innerHTML = `<div class="user-found" style="border-color:var(--error);color:var(--error)">
+      ⚠️ Error en la cerca: ${r.error}
+    </div>`;
+    return;
+  }
+
+  if (r.trobat) {
+    const u = r.usuari;
+    el.innerHTML = `<div class="user-found">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/>
+      </svg>
+      <strong>${u.NOM}</strong> — usuari existent · ${r.totalAtencions} atencions prèvies
+    </div>`;
+    prefillForm(u);
+    goStep(2);
+  } else {
+    el.innerHTML = `<div class="user-found user-new">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      Usuari nou · Completa les dades personals
+    </div>`;
+    clearForm();
+    goStep(2);
+  }
+}
+
+function prefillForm(u) {
+  const set = (id, val) => { const el=document.getElementById(id); if(el&&val) el.value=val; };
+  set('f-nom',     u.NOM);
+  set('f-genere',  u.GÈNERE);
+  set('f-lloc',    u['LLOC DE NAIXEMENT']);
+  set('f-persones',u['TOTAL PERSONES HABITATGE']);
+  set('f-barri',   u.BARRI);
+  set('f-tinenca', u.TINENÇA);
+  set('f-adreca',  u.ADREÇA);
+  set('f-telf',    u['TELF. 1']);
+  set('f-email',   u['E-MAIL']);
+
+  document.getElementById('user-banner').style.display = 'flex';
+  document.getElementById('user-banner').innerHTML = `
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+    </svg>
+    Usuari trobat: <strong>${u.NOM}</strong> · DNI: ${u.DNI}. Pots actualitzar les dades si cal.`;
+}
+
+function clearForm() {
+  ['f-nom','f-genere','f-lloc','f-persones','f-barri','f-tinenca','f-adreca','f-telf','f-email',
+   'f-derivacio','f-qui-rep','f-referent','f-cal-ass','f-obs'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.querySelectorAll('[name="circ"],[name="assess"]').forEach(cb => cb.checked = false);
+  document.getElementById('user-banner').style.display = 'none';
+}
+
+// ── STEP NAVIGATION ───────────────────────────────────────────
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('step-'+i).style.display = i===n ? 'block' : 'none';
+    const stepEl = document.getElementById('step'+i);
+    stepEl.className = 'step ' + (i < n ? 'done' : i===n ? 'active' : '');
+  });
+  [1,2].forEach(i => {
+    document.getElementById('line'+i).className = 'step-line ' + (i < n ? 'done' : '');
+  });
+  const labels = {1:'Identificació',2:'Dades i atenció',3:'Assessoraments'};
+  document.getElementById('step-label').textContent = labels[n];
+  currentStep = n;
+  document.getElementById('content').scrollTop = 0;
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+function submitForm() {
+  const required = [
+    {id:'f-nom',label:'Nom'},
+    {id:'f-genere',label:'Gènere'},
+    {id:'f-barri',label:'Barri'},
+    {id:'f-tinenca',label:'Tinença'},
+    {id:'f-derivacio',label:'Derivació'},
+    {id:'f-qui-rep',label:'Qui rep'}
+  ];
+  for (const {id,label} of required) {
+    if (!document.getElementById(id).value) {
+      showToast(`Camp obligatori: ${label}`, 'error');
+      goStep(2); return;
+    }
+  }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Guardant…';
+
+  const assessos = [...document.querySelectorAll('[name="assess"]:checked')].map(c=>c.value);
+  const circs    = [...document.querySelectorAll('[name="circ"]:checked')].map(c=>c.value);
+
+  const fd = {
+    dni:           currentDNI,
+    nom:           document.getElementById('f-nom').value,
+    genere:        document.getElementById('f-genere').value,
+    llocNaix:      document.getElementById('f-lloc').value,
+    persones:      document.getElementById('f-persones').value,
+    barri:         document.getElementById('f-barri').value,
+    tinenca:       document.getElementById('f-tinenca').value,
+    adreca:        document.getElementById('f-adreca').value,
+    telf:          document.getElementById('f-telf').value,
+    email:         document.getElementById('f-email').value,
+    derivacio:     document.getElementById('f-derivacio').value,
+    quiRep:        document.getElementById('f-qui-rep').value,
+    referent:      document.getElementById('f-referent').value,
+    calAssessorament: document.getElementById('f-cal-ass').value,
+    circumstancies: circs,
+    observacions:  document.getElementById('f-obs').value,
+    assessoraments: assessos
+  };
+
+  google.script.run
+    .withSuccessHandler(r => {
+      btn.disabled = false;
+      btn.innerHTML = '✓ Guardar atenció';
+      if (r.ok) {
+        showToast(r.missatge, 'success');
+        statsLoaded = false;
+        clearForm();
+        goStep(1);
+        document.getElementById('input-dni').value = '';
+        document.getElementById('lookup-result').style.display = 'none';
+        document.getElementById('step-2').style.display = 'none';
+        document.getElementById('step-3').style.display = 'none';
+        document.getElementById('step-1').style.display = 'block';
+        currentStep = 1;
+        [1,2,3].forEach(i => { document.getElementById('step'+i).className='step'+(i===1?' active':''); });
+        document.getElementById('step-label').textContent = 'Identificació';
+      } else {
+        showToast('Error: ' + r.error, 'error');
+      }
+    })
+    .withFailureHandler(e => {
+      btn.disabled = false;
+      btn.innerHTML = '✓ Guardar atenció';
+      showToast('Error: ' + e.message, 'error');
+    })
+    .guardarAtencio(fd);
+}
+
+// ── CERCA USUARI ──────────────────────────────────────────────
+function searchUser() {
+  const dni = document.getElementById('search-dni').value.trim().toUpperCase();
+  if (dni.length < 8) { showToast('Introdueix un DNI/NIE vàlid', 'error'); return; }
+  document.getElementById('search-result').innerHTML =
+    '<div class="loading-row"><div class="spinner"></div> Cercant…</div>';
+
+  google.script.run
+    .withSuccessHandler(renderUserCard)
+    .withFailureHandler(e => showToast(e.message,'error'))
+    .buscarUsuariPerDNI(dni);
+}
+
+function renderUserCard(r) {
+  const el = document.getElementById('search-result');
+  if (!r.trobat) {
+    el.innerHTML = `<div class="empty-state">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <line x1="8" y1="11" x2="14" y2="11"/>
+      </svg>
+      <p>No s'ha trobat cap usuari amb aquest DNI/NIE</p>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="navigate('nova-atencio')">+ Crear usuari nou</button>
+    </div>`;
+    return;
+  }
+  const u = r.usuari;
+  const histHtml = r.historial.length ? r.historial.map(h => `
+    <tr>
+      <td>${h.fecha}</td>
+      <td>${badgeDerivacio(h.derivacio)}</td>
+      <td class="td-muted">${h.quiRep}</td>
+      <td class="td-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.observ}</td>
+    </tr>`).join('') :
+    '<tr><td colspan="4" class="td-muted" style="padding:16px;text-align:center">Cap atenció registrada</td></tr>';
+
+  el.innerHTML = `
+    <div class="user-card">
+      <div class="user-card-header">
+        <h2>${u.NOM || '-'}</h2>
+        <div class="sub">DNI: ${u.DNI} · ${r.totalAtencions} atencions · Barri: ${u.BARRI || '-'}</div>
+      </div>
+      <div class="user-card-body">
+        <div class="user-info-grid">
+          <div class="info-item"><div class="info-label">Gènere</div><div class="info-value">${u.GÈNERE||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Lloc Naix.</div><div class="info-value">${u['LLOC DE NAIXEMENT']||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Barri</div><div class="info-value">${u.BARRI||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Tinença</div><div class="info-value">${u.TINENÇA||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Persones</div><div class="info-value">${u['TOTAL PERSONES HABITATGE']||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Telèfon</div><div class="info-value">${u['TELF. 1']||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Email</div><div class="info-value" style="font-size:12px">${u['E-MAIL']||'-'}</div></div>
+          <div class="info-item"><div class="info-label">Adreça</div><div class="info-value" style="font-size:12px">${u.ADREÇA||'-'}</div></div>
+        </div>
+        <div class="card-title" style="margin-top:16px;margin-bottom:10px">Últimes atencions</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Derivació</th><th>Tècnic</th><th>Observacions</th></tr></thead>
+            <tbody>${histHtml}</tbody>
+          </table>
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn btn-primary" onclick="newAtencioForUser('${u.DNI}')">+ Nova atenció</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('search-result').innerHTML=''">Tancar</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function openUser(dni) {
+  document.getElementById('search-dni').value = dni;
+  navigate('cerca');
+  searchUser();
+}
+
+function newAtencioForUser(dni) {
+  document.getElementById('input-dni').value = dni;
+  navigate('nova-atencio');
+  lookupDNI();
+}
+
+// ── ÚLTIMS REGISTRES ──────────────────────────────────────────
+function loadRegistres() {
+  document.getElementById('registres-body').innerHTML =
+    '<tr><td colspan="7"><div class="loading-row"><div class="spinner"></div></div></td></tr>';
+  google.script.run
+    .withSuccessHandler(renderRegistres)
+    .withFailureHandler(e => showToast(e.message,'error'))
+    .getUltimesAtencions(30);
+}
+
+function renderRegistres(d) {
+  if (!d.ok) { showToast('Error: ' + d.error,'error'); return; }
+  const rows = d.rows.map(r => `
+    <tr onclick="openUser('${r.dni}')">
+      <td class="td-muted" style="font-size:12px">#${r.id}</td>
+      <td>${r.fecha}</td>
+      <td><strong>${r.nom}</strong></td>
+      <td class="td-mono">${r.dni}</td>
+      <td>${badgeDerivacio(r.derivacio)}</td>
+      <td class="td-muted">${r.quiRep}</td>
+      <td>${r.calAss==='Sí'?'<span class="badge badge-green">Sí</span>':r.calAss==='No'?'<span class="badge badge-blue">No</span>':'<span class="badge" style="background:var(--surface-2);color:var(--muted)">'+r.calAss+'</span>'}</td>
+    </tr>`).join('');
+  document.getElementById('registres-body').innerHTML = rows ||
+    '<tr><td colspan="7"><div class="empty-state"><p>Cap registre disponible</p></div></td></tr>';
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  loadDashboard();
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-3').style.display = 'none';
+});
+</script>
+</body>
+</html>
